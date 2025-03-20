@@ -2,108 +2,138 @@
 
 @section('content')
 <div class="container">
-    <h2 class="mb-4">📆 Monthly Attendance Report ({{ $currentMonth }})</h2>
+    <h2 class="mb-4 text-center">📆 Monthly Attendance Report ({{ $currentMonth }})</h2>
 
-    <!-- Bar Chart for Attendance per Date -->
-    <div class="mb-4">
-        <canvas id="attendanceBarChart"></canvas>
+    <!-- Filter Form -->
+    <form method="GET" action="{{ route('attendance.report.monthly') }}" class="mb-4 text-center">
+        <label for="month">Select Month:</label>
+        <input type="month" id="month" name="month" value="{{ $currentMonth }}" class="form-control w-50 d-inline">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    <!-- Charts Wrapper -->
+    <div class="charts-wrapper">
+        <div class="chart-container">
+            <canvas id="attendanceBarChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="attendancePieChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="attendanceLineChart"></canvas>
+        </div>
     </div>
 
-    <!-- Pie Chart for Total Attendance by Category -->
-    <div class="mb-4">
-        <canvas id="attendancePieChart"></canvas>
+    <!-- Attendance Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>👨 Men</th>
+                    <th>👩 Women</th>
+                    <th>👶 Children</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($dates as $index => $date)
+                    <tr>
+                        <td>{{ $date }}</td>
+                        <td>{{ $menData[$index] }}</td>
+                        <td>{{ $womenData[$index] }}</td>
+                        <td>{{ $childrenData[$index] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
-
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Date</th>
-                <th>👨 Men</th>
-                <th>👩 Women</th>
-                <th>👶 Children</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($attendanceData as $data)
-                <tr>
-                    <td>{{ $data->date }}</td>
-                    <td>{{ $data->men }}</td>
-                    <td>{{ $data->women }}</td>
-                    <td>{{ $data->children }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4" class="text-center">No attendance records for this month.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Prepare the data for the bar chart
-    const dates = @json($dates); // Dates for the x-axis
-    const menData = @json($menData); // Men attendance data for the y-axis
-    const womenData = @json($womenData); // Women attendance data for the y-axis
-    const childrenData = @json($childrenData); // Children attendance data for the y-axis
+    document.addEventListener("DOMContentLoaded", function () {
+        const dates = @json($dates);
+        const menData = @json($menData);
+        const womenData = @json($womenData);
+        const childrenData = @json($childrenData);
 
-    // Bar Chart Configuration
-    const ctxBar = document.getElementById('attendanceBarChart').getContext('2d');
-    const attendanceBarChart = new Chart(ctxBar, {
-        type: 'bar',
-        data: {
-            labels: dates, // X-axis labels (dates)
-            datasets: [{
-                label: '👨 Men',
-                data: menData,
-                backgroundColor: '#f39c12',
-                borderColor: '#e67e22',
-                borderWidth: 1
-            }, {
-                label: '👩 Women',
-                data: womenData,
-                backgroundColor: '#9b59b6',
-                borderColor: '#8e44ad',
-                borderWidth: 1
-            }, {
-                label: '👶 Children',
-                data: childrenData,
-                backgroundColor: '#3498db',
-                borderColor: '#2980b9',
-                borderWidth: 1
-            }]
-        },
-        options: {
+        const chartOptions = {
             responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } }
+        };
 
-    // Pie Chart Configuration for total attendance by category
-    const ctxPie = document.getElementById('attendancePieChart').getContext('2d');
-    const attendancePieChart = new Chart(ctxPie, {
-        type: 'pie',
-        data: {
-            labels: ['👨 Men', '👩 Women', '👶 Children'],
-            datasets: [{
-                data: [
-                    menData.reduce((a, b) => a + b, 0),  // Total men
-                    womenData.reduce((a, b) => a + b, 0), // Total women
-                    childrenData.reduce((a, b) => a + b, 0) // Total children
-                ],
-                backgroundColor: ['#f39c12', '#9b59b6', '#3498db'],
-                borderColor: ['#e67e22', '#8e44ad', '#2980b9'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true
+        function createChart(chartId, type, datasets, labels) {
+            let ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: type,
+                data: { labels: labels, datasets: datasets },
+                options: chartOptions
+            });
         }
+
+        // Bar Chart
+        createChart("attendanceBarChart", "bar", [
+            { label: "👨 Men", data: menData, backgroundColor: "#f39c12" },
+            { label: "👩 Women", data: womenData, backgroundColor: "#9b59b6" },
+            { label: "👶 Children", data: childrenData, backgroundColor: "#3498db" }
+        ], dates);
+   
+        // Pie Chart
+        createChart("attendancePieChart", "pie", [{
+            data: [@json($totalMen), @json($totalWomen), @json($totalChildren)],
+            backgroundColor: ["#f39c12", "#9b59b6", "#3498db"]
+        }], ["👨 Men", "👩 Women", "👶 Children"]);
+
+        // Line Chart
+        createChart("attendanceLineChart", "line", [
+            { label: "👨 Men", data: menData, borderColor: "#f39c12", fill: false },
+            { label: "👩 Women", data: womenData, borderColor: "#9b59b6", fill: false },
+            { label: "👶 Children", data: childrenData, borderColor: "#3498db", fill: false }
+        ], dates);
     });
 </script>
+
+<style>
+    /* Wrapper to flex charts properly */
+    .charts-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        width: 100%;
+    }
+
+    /* Chart container adapts to screen size */
+    .chart-container {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9; /* Maintains proper ratio */
+    }
+
+    canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Make table scrollable on mobile */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    /* Adjust sizes for smaller screens */
+    @media (max-width: 768px) {
+        .chart-container {
+            aspect-ratio: 4 / 3;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .chart-container {
+            aspect-ratio: 1 / 1;
+        }
+    }
+</style>
+
 @endsection

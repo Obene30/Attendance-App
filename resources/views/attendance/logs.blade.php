@@ -17,7 +17,7 @@
             @forelse($logs as $log)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $log->user->name }}</td>
+                    <td>{{ $log->user ? $log->user->first_name : 'Unknown User' }}</td>
                     <td>{{ ucfirst(str_replace('_', ' ', $log->action)) }}</td>
                     <td>{{ $log->description }}</td>
                     <td>{{ $log->created_at->format('d M Y, h:i A') }}</td>

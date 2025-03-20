@@ -65,15 +65,17 @@ public function markAttendance()
     {
         $startDate = Carbon::now()->startOf($period);
         $endDate = Carbon::now()->endOf($period);
+        $attendanceData = Attendance::whereMonth('date', now()->month)->get();
 
-        $attendanceData = Attendance::whereBetween('created_at', [$startDate, $endDate])
-            ->get()
-            ->groupBy('category')
-            ->map(function ($group) {
-                return $group->count();
-            });
-
-        return $attendanceData;
+        $dates = $attendanceData->pluck('date')->toArray();
+        $menData = $attendanceData->pluck('men')->toArray();
+        $womenData = $attendanceData->pluck('women')->toArray();
+        $childrenData = $attendanceData->pluck('children')->toArray();
+        
+       
+        
+        return view('your_view', compact('dates', 'menData', 'womenData', 'childrenData'));
+        
     }
 
 
@@ -93,22 +95,22 @@ public function store(Request $request)
     $request->validate([
         'date' => 'required|date',
         'attendees' => 'required|array',
+        'status' => 'required|array',
+        'comment' => 'nullable|array',
     ]);
 
-    foreach ($request->attendees as $attendee_id) {
-        Attendance::updateOrCreate(
-            [
-                'attendee_id' => $attendee_id,
-                'date' => $request->date,
-            ],
-            [
-                'status' => $request->status[$attendee_id],
-            ]
-        );
+    foreach ($request->attendees as $attendeeId) {
+        Attendance::create([
+            'attendee_id' => $attendeeId,
+            'date' => $request->date,
+            'status' => $request->status[$attendeeId] ?? 'absent',
+            'comment' => $request->comment[$attendeeId] ?? null,
+        ]);
     }
 
-    return redirect()->route('attendance.mark')->with('success', 'Attendance marked successfully.');
+    return redirect()->back()->with('success', 'Attendance marked successfully!');
 }
+
 
 
 
@@ -193,36 +195,52 @@ public function exportExcel()
     }
     
 
-public function monthlyReport()
-{
+
+
+
+
+    public function monthlyReport(Request $request)
+    {
+        $currentMonth = $request->input('month', Carbon::now()->format('Y-m')); // Default to current month
     
- // Define the current month if not already set
-$currentMonth = date('Y-m'); // 'YYYY-MM' format
-
-// Fetch attendance data grouped by date and category
-$attendanceData = DB::table('attendances')
-    ->select(
-        DB::raw('DATE(created_at) as date'),
-        DB::raw('SUM(CASE WHEN category = "Men" THEN 1 ELSE 0 END) as men'),
-        DB::raw('SUM(CASE WHEN category = "Women" THEN 1 ELSE 0 END) as women'),
-        DB::raw('SUM(CASE WHEN category = "Children" THEN 1 ELSE 0 END) as children')
-    )
-    ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$currentMonth]) // Filter by current month
-    ->groupBy(DB::raw('DATE(created_at)')) // Use the raw SQL for grouping
-    ->orderBy('date', 'asc')
-    ->get();
-
-// Prepare the data for charts
-$dates = $attendanceData->pluck('date');
-$menData = $attendanceData->pluck('men');
-$womenData = $attendanceData->pluck('women');
-$childrenData = $attendanceData->pluck('children');
-
-// Return the view with the data and chart-ready data
-return view('attendance.monthly-report', compact('attendanceData', 'currentMonth', 'dates', 'menData', 'womenData', 'childrenData'));
-
-}
-
+        // Fetch attendance for the selected month, with attendee details
+        $attendanceData = Attendance::where('date', 'like', "$currentMonth%")
+            ->with('attendee') // Load related attendee data
+            ->get();
+    
+        // Extract unique dates
+        $dates = $attendanceData->pluck('date')->unique()->values()->toArray();
+    
+        // Initialize arrays for category-based data
+        $menData = [];
+        $womenData = [];
+        $childrenData = [];
+    
+        foreach ($dates as $date) {
+            $menData[] = $attendanceData
+                ->where('date', $date)
+                ->where('attendee.category', 'Men') // Filter by category
+                ->count();
+    
+            $womenData[] = $attendanceData
+                ->where('date', $date)
+                ->where('attendee.category', 'Women')
+                ->count();
+    
+            $childrenData[] = $attendanceData
+                ->where('date', $date)
+                ->where('attendee.category', 'Children')
+                ->count();
+        }
+    
+        // Total counts for pie chart
+        $totalMen = array_sum($menData);
+        $totalWomen = array_sum($womenData);
+        $totalChildren = array_sum($childrenData);
+    
+        return view('attendance.monthly-report', compact('currentMonth', 'dates', 'menData', 'womenData', 'childrenData', 'totalMen', 'totalWomen', 'totalChildren'));
+    }
+    
 
 
 

@@ -10,6 +10,12 @@ class Attendee extends Model
     use HasFactory;
 
     protected $fillable = ['full_name', 'address', 'dob', 'sex', 'category'];
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
 }
 
 

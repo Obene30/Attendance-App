@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('activity_logs', function (Blueprint $table) {
-            $table->string('user')->nullable();  // Add the 'user' column for storing names
+            $table->string('users')->nullable();  // Add the 'user' column for storing names
         });
     }
     
@@ -24,3 +24,6 @@ return new class extends Migration
     }
     
 };
+
+
+

@@ -34,6 +34,7 @@
                 <td>
                     <span class="badge {{ $attendance->status == 'Present' ? 'bg-success' : 'bg-danger' }}">
                         {{ $attendance->status }}
+                        <td>{{ $attendance->comment ?? 'No comment' }}</td>
                     </span>
                 </td>
             </tr>

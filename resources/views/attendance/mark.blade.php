@@ -25,13 +25,14 @@
                     <th>Name</th>
                     <th>Category</th>
                     <th>Status</th>
+                    <th>Comment</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($attendees as $attendee)
                 <tr>
                     <td>
-                        <input type="checkbox" name="attendees[]" value="{{ $attendee->id }}">
+                        <input type="checkbox" name="attendees[]" value="{{ $attendee->id }}" class="attendee-checkbox">
                     </td>
                     <td>{{ $attendee->full_name }}</td>
                     <td>{{ $attendee->category }}</td>
@@ -41,16 +42,32 @@
                             <option value="absent">Absent</option>
                         </select>
                     </td>
+                    <td>
+                        <input type="text" name="comment[{{ $attendee->id }}]" class="form-control comment-input" placeholder="Enter comment" disabled>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
+
         <div class="d-flex justify-content-center mt-3">
-    {{ $attendees->links() }}
-</div>
+            {{ $attendees->links() }}
+        </div>
 
         <button type="submit" class="btn btn-primary">Submit Attendance</button>
     </form>
-    
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll(".attendee-checkbox");
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", function () {
+                const commentInput = this.closest("tr").querySelector(".comment-input");
+                commentInput.disabled = !this.checked;
+            });
+        });
+    });
+</script>
+
 @endsection

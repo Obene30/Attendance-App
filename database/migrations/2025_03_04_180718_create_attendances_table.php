@@ -16,7 +16,9 @@ return new class extends Migration
         $table->foreignId('attendee_id')->constrained()->onDelete('cascade');
         $table->date('date');
         $table->string('status');
+        $table->string('comment')->nullable();
         $table->timestamps();
+        
     
     });
 }

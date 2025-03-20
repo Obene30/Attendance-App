@@ -21,9 +21,9 @@ class UserSeeder extends Seeder
     
         // Create Pastor User
         $shepherd = User::create([
-            'first_name' => 'shepherd',
+            'first_name' => 'emeka',
             'last_name' => 'User',
-            'email' => 'shepherd@msciarmley.com',
+            'email' => 'emeka@msciarmley.com',
             'password' => bcrypt('password'),
         ]);
         $shepherd->assignRole('shepherd');
