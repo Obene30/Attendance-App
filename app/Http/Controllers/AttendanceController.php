@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\DB;
-
+use App\Services\GoogleSheetsService;
+use App\Models\Group;
 
 
 
@@ -300,6 +301,11 @@ public function report(Request $request)
 
     return view('attendance.report', compact('attendances'));
 }
+
+
+
+
+
 
 
 

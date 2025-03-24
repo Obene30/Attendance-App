@@ -10,6 +10,9 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ReportController;
 use App\Exports\AttendanceExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\GroupController;
+
+
 
 
 Route::get('/', function () {
@@ -105,6 +108,14 @@ Route::get('/attendance/logs', [ActivityLogController::class, 'index'])->name('a
 Route::get('/attendance/export-excel', function () {
     return Excel::download(new AttendanceExport, 'attendance.xlsx');
 })->name('attendance.exportExcel');
+
+
+//create group
+
+
+Route::resource('groups', GroupController::class);
+Route::post('/groups/{group}/addMember', [GroupController::class, 'addMember'])->name('groups.addMember');
+Route::delete('/groups/{group}/removeMember/{user}', [GroupController::class, 'removeMember'])->name('groups.removeMember');
 
 
 

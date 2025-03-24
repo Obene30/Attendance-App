@@ -21,7 +21,7 @@
             <input type="text" class="form-control" id="address" name="address" required>
         </div>
         <div class="mb-3">
-    <label for="dob" class="form-label">Date of Birth (Month & Day Only)</label>
+    <label for="dob" class="form-label">Birthday (Month & Day Only)</label>
     <input type="text" class="form-control" id="dob" name="dob" placeholder="MM-DD" required>
 </div>
 

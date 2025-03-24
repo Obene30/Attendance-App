@@ -45,6 +45,14 @@
             font-weight: bold;
         }
 
+        /* Mustard Hover Color for Dropdown Items */
+.dropdown-menu .dropdown-item:hover {
+    background-color: #FFDB58 !important;
+    color: black !important;
+    font-weight: bold;
+}
+
+
         /* Toggle Button */
         .toggle-btn {
             position: fixed;
@@ -103,11 +111,22 @@
         <ul class="nav flex-column">
             @if(auth()->user()->hasRole('Admin'))
                 <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link" id="dashboard-link">🏠 Dashboard</a></li>
-                <li class="nav-item"><a href="{{ route('attendees.index') }}" class="nav-link">👥 Manage Attendees</a></li>
+                <li class="nav-item"><a href="{{ route('attendees.index') }}" class="nav-link">👥 Attendees Manager</a></li>
                 <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link">✅ Mark Attendance</a></li>
                 <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link">📅 View Attendance</a></li>
-                <li class="nav-item"><a href="{{ route('attendance.report', ['period' => 'weekly']) }}" class="nav-link">📊 Weekly Report</a></li>
-                <li class="nav-item"><a href="{{ route('attendance.report.monthly') }}" class="nav-link">📆 Monthly Report</a></li>
+                <li class="nav-item"><a href="{{ route('groups.index') }}" class="nav-link">👤 Group Manager</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        📊 Reports
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="reportDropdown">
+                        <li><a class="dropdown-item" href="{{ route('attendance.report', ['period' => 'weekly']) }}">📊 Weekly Report</a></li>
+                        <li><a class="dropdown-item" href="{{ route('attendance.report.monthly') }}">📆 Monthly Report</a></li>
+                    </ul>
+                </li>
+                
+                
+                
                 <li class="nav-item"><a href="{{ route('attendance.logs') }}" class="nav-link">📄 Activity Logs</a></li>
 
                 <!-- Export Dropdown -->
@@ -129,7 +148,7 @@
     <ul class="nav flex-column">
         @if(auth()->user()->hasRole('Shepherd'))
             <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link text-white">🏠 Dashboard</a></li>
-            <li class="nav-item"><a href="{{ route('attendees.index') }}" class="nav-link text-white">👥 Manage Attendees</a></li>
+           
             <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link text-white">✅ Mark Attendance</a></li>
             <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link text-white">📅 View Attendance</a></li>
             <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link text-white">🚪 Logout</a></li>
