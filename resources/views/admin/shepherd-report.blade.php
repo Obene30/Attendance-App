@@ -148,25 +148,15 @@
 </script>
 
 <style>
-    .chart-container {
-        position: relative;
-        width: 100%;
-        height: 300px;
+    canvas {
+        width: 100% !important;
+        height: auto !important;
     }
 
-    @media (max-width: 576px) {
-        .chart-container {
-            height: 250px;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .card-header {
-            font-size: 1rem;
-            padding: 0.75rem 1rem;
-        }
+    .table-responsive {
+        max-height: 300px;
+        overflow-y: auto;
     }
 </style>
+
 @endsection
