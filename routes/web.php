@@ -12,6 +12,7 @@ use App\Exports\AttendanceExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ShepherdController;
+use App\Http\Controllers\AdminController;
 
 
 
@@ -124,12 +125,34 @@ Route::post('/attendees/{attendee}/assign', [AttendeeController::class, 'assign'
 
 
 //shepherd assigned
-Route::middleware(['auth', 'role:Shepherd'])->group(function () {
+
+Route::get('/my-attendees', [ShepherdController::class, 'myAttendees'])->name('shepherd.attendees')->middleware('auth');
+
+
+
+
+// Shepherd
+Route::middleware(['auth'])->group(function () {
     Route::get('/my-attendees', [ShepherdController::class, 'myAttendees'])->name('shepherd.attendees');
+    Route::get('/attendance/mark', [ShepherdController::class, 'showMarkAttendance'])->name('attendance.mark');
+    Route::post('/attendance/mark', [ShepherdController::class, 'storeAttendance'])->name('attendance.store');
+    Route::get('/attendance/view', [ShepherdController::class, 'viewAttendance'])->name('attendance.view');
 });
 
 
 
+Route::get('/admin/shepherd-report', [AdminController::class, 'shepherdReport'])->name('admin.shepherd.report')->middleware('auth');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/shepherd-attendance', [AdminController::class, 'viewShepherdAttendance'])->name('admin.shepherd.attendance');
+});
+
+Route::delete('/attendance/{id}', [ShepherdController::class, 'destroyAttendance'])->name('attendance.destroy');
 
 
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/shepherd-attendance', [AdminController::class, 'viewShepherdAttendance'])
+        ->name('admin.shepherd-attendance');
+});

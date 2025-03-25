@@ -8,6 +8,13 @@
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
+
+        <script>
+            setTimeout(() => {
+                const alert = document.querySelector('.alert-success');
+                if (alert) alert.remove();
+            }, 4000); // 4 seconds
+        </script>
     @endif
 
     <form action="{{ route('attendance.store') }}" method="POST">
@@ -69,5 +76,4 @@
         });
     });
 </script>
-
 @endsection

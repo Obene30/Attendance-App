@@ -15,7 +15,7 @@
             <tr>
                 <th>Name</th>
                 <th>Address</th>
-                <th>DOB</th>
+                <th>Birthdays</th>
                 <th>Sex</th>
                 <th>Category</th>
                 <th>Shepherd</th>
@@ -30,7 +30,7 @@
             <tr>
                 <td>{{ $attendee->full_name }}</td>
                 <td>{{ $attendee->address }}</td>
-                <td>{{ $attendee->DOB }}</td>
+                <td>{{ $attendee->dob }}</td>
                 <td>{{ $attendee->sex }}</td>
                 <td>{{ $attendee->category }}</td>
                 <td>{{ $attendee->shepherd?->first_name ?? '—' }}</td>

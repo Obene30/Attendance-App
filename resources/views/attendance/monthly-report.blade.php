@@ -6,49 +6,85 @@
 
     <!-- Filter Form -->
     <form method="GET" action="{{ route('attendance.report.monthly') }}" class="mb-4 text-center">
-        <label for="month">Select Month:</label>
-        <input type="month" id="month" name="month" value="{{ $currentMonth }}" class="form-control w-50 d-inline">
+        <label for="month" class="form-label fw-semibold">Select Month:</label>
+        <input type="month" id="month" name="month" value="{{ $currentMonth }}" class="form-control w-auto d-inline mx-2">
         <button type="submit" class="btn btn-primary">Filter</button>
     </form>
 
-    <!-- Charts Wrapper -->
-    <div class="charts-wrapper">
-        <div class="chart-container">
-            <canvas id="attendanceBarChart"></canvas>
+    <!-- Charts Section -->
+    <div class="row g-4">
+        <!-- Bar Chart Card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white fw-semibold">
+                    📊 Attendance Bar Chart
+                </div>
+                <div class="card-body">
+                    <canvas id="attendanceBarChart" height="300"></canvas>
+                </div>
+            </div>
         </div>
-        <div class="chart-container">
-            <canvas id="attendancePieChart"></canvas>
+
+        <!-- Line Chart Card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white fw-semibold">
+                    📈 Attendance Line Chart
+                </div>
+                <div class="card-body">
+                    <canvas id="attendanceLineChart" height="300"></canvas>
+                </div>
+            </div>
         </div>
-        <div class="chart-container">
-            <canvas id="attendanceLineChart"></canvas>
+
+       <!-- Pie Chart & Table Row -->
+<div class="row g-4 mt-3">
+    <!-- Pie Chart Card -->
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-warning text-dark fw-semibold">
+                🥧 Attendance Pie Chart
+            </div>
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="attendancePieChart" style="max-width: 100%; height: 300px;"></canvas>
+            </div>
         </div>
     </div>
 
     <!-- Attendance Table -->
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Date</th>
-                    <th>👨 Men</th>
-                    <th>👩 Women</th>
-                    <th>👶 Children</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($dates as $index => $date)
-                    <tr>
-                        <td>{{ $date }}</td>
-                        <td>{{ $menData[$index] }}</td>
-                        <td>{{ $womenData[$index] }}</td>
-                        <td>{{ $childrenData[$index] }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-dark text-white fw-semibold">
+                📋 Detailed Attendance by Date
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>👨 Men</th>
+                            <th>👩 Women</th>
+                            <th>👶 Children</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($dates as $index => $date)
+                            <tr>
+                                <td>{{ $date }}</td>
+                                <td>{{ $menData[$index] }}</td>
+                                <td>{{ $womenData[$index] }}</td>
+                                <td>{{ $childrenData[$index] }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
+
+<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -56,84 +92,76 @@
         const menData = @json($menData);
         const womenData = @json($womenData);
         const childrenData = @json($childrenData);
+        const totalMen = {{ $totalMen }};
+        const totalWomen = {{ $totalWomen }};
+        const totalChildren = {{ $totalChildren }};
 
         const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
         };
 
-        function createChart(chartId, type, datasets, labels) {
-            let ctx = document.getElementById(chartId).getContext('2d');
-            new Chart(ctx, {
-                type: type,
-                data: { labels: labels, datasets: datasets },
-                options: chartOptions
-            });
-        }
-
         // Bar Chart
-        createChart("attendanceBarChart", "bar", [
-            { label: "👨 Men", data: menData, backgroundColor: "#f39c12" },
-            { label: "👩 Women", data: womenData, backgroundColor: "#9b59b6" },
-            { label: "👶 Children", data: childrenData, backgroundColor: "#3498db" }
-        ], dates);
-   
-        // Pie Chart
-        createChart("attendancePieChart", "pie", [{
-            data: [@json($totalMen), @json($totalWomen), @json($totalChildren)],
-            backgroundColor: ["#f39c12", "#9b59b6", "#3498db"]
-        }], ["👨 Men", "👩 Women", "👶 Children"]);
+        new Chart(document.getElementById("attendanceBarChart").getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: dates,
+                datasets: [
+                    { label: "👨 Men", data: menData, backgroundColor: "#f39c12" },
+                    { label: "👩 Women", data: womenData, backgroundColor: "#9b59b6" },
+                    { label: "👶 Children", data: childrenData, backgroundColor: "#3498db" }
+                ]
+            },
+            options: chartOptions
+        });
 
         // Line Chart
-        createChart("attendanceLineChart", "line", [
-            { label: "👨 Men", data: menData, borderColor: "#f39c12", fill: false },
-            { label: "👩 Women", data: womenData, borderColor: "#9b59b6", fill: false },
-            { label: "👶 Children", data: childrenData, borderColor: "#3498db", fill: false }
-        ], dates);
+        new Chart(document.getElementById("attendanceLineChart").getContext("2d"), {
+            type: "line",
+            data: {
+                labels: dates,
+                datasets: [
+                    { label: "👨 Men", data: menData, borderColor: "#f39c12", fill: false, tension: 0.3 },
+                    { label: "👩 Women", data: womenData, borderColor: "#9b59b6", fill: false, tension: 0.3 },
+                    { label: "👶 Children", data: childrenData, borderColor: "#3498db", fill: false, tension: 0.3 }
+                ]
+            },
+            options: chartOptions
+        });
+
+        // Pie Chart
+        new Chart(document.getElementById("attendancePieChart").getContext("2d"), {
+            type: "pie",
+            data: {
+                labels: ["👨 Men", "👩 Women", "👶 Children"],
+                datasets: [{
+                    data: [totalMen, totalWomen, totalChildren],
+                    backgroundColor: ["#f39c12", "#9b59b6", "#3498db"]
+                }]
+            },
+            options: { responsive: true }
+        });
     });
 </script>
-
 <style>
-    /* Wrapper to flex charts properly */
-    .charts-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        width: 100%;
-    }
-
-    /* Chart container adapts to screen size */
-    .chart-container {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        aspect-ratio: 16 / 9; /* Maintains proper ratio */
-    }
-
     canvas {
         width: 100% !important;
         height: auto !important;
     }
 
-    /* Make table scrollable on mobile */
     .table-responsive {
-        overflow-x: auto;
-    }
-
-    /* Adjust sizes for smaller screens */
-    @media (max-width: 768px) {
-        .chart-container {
-            aspect-ratio: 4 / 3;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .chart-container {
-            aspect-ratio: 1 / 1;
-        }
+        max-height: 300px;
+        overflow-y: auto;
     }
 </style>
+
 
 @endsection

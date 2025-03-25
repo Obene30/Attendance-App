@@ -2,46 +2,63 @@
 
 @section('content')
 <div class="container">
-    <div class="py-4"></div> <!-- Added padding above the title -->
-    
-    <h2 class="text-center mb-4">📊 Welcome To MSCI Armley Attendance System</h2> <!-- Added bottom margin -->
+    <div class="py-4"></div>
 
-    <div class="py-2"></div> <!-- Additional spacing for balance -->
+    <h2 class="text-center mb-4">📊 Welcome To MSCI Armley Attendance System</h2>
 
-    <div class="row g-4"> <!-- Added Bootstrap gutter spacing -->
-        <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3 p-4"> <!-- Increased padding -->
+    <!-- Stat Cards -->
+    <div class="row g-4">
+        <div class="col-12 col-md-4">
+            <div class="card text-white bg-primary shadow p-4 h-100">
                 <h4>👥 Total Attendees</h4>
                 <p class="fs-3">{{ $totalAttendees }}</p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3 p-4">
+        <div class="col-12 col-md-4">
+            <div class="card text-white bg-success shadow p-4 h-100">
                 <h4>📅 Weekly Attendance</h4>
                 <p class="fs-3">{{ $weeklyAttendance }}</p>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-warning mb-3 p-4">
+        <div class="col-12 col-md-4">
+            <div class="card text-white bg-warning shadow p-4 h-100">
                 <h4>📆 Monthly Attendance</h4>
                 <p class="fs-3">{{ $monthlyAttendance }}</p>
             </div>
         </div>
     </div>
 
-    <div class="py-3"></div> <!-- Added spacing before charts -->
+    <div class="py-4"></div>
 
-    <!-- Charts Section -->
-    <div class="charts-wrapper">
-        <div class="chart-container">
-            <canvas id="attendanceBarChart"></canvas>
+    <!-- Charts -->
+    <div class="row g-4">
+        <!-- Bar Chart -->
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white fw-semibold">
+                    📊 Attendance Bar Chart
+                </div>
+                <div class="card-body chart-wrapper">
+                    <canvas id="attendanceBarChart"></canvas>
+                </div>
+            </div>
         </div>
-        <div class="chart-container">
-            <canvas id="attendanceLineChart"></canvas>
+
+        <!-- Line Chart -->
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white fw-semibold">
+                    📈 Attendance Trend Line Chart
+                </div>
+                <div class="card-body chart-wrapper">
+                    <canvas id="attendanceLineChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+{{-- Chart.js CDN --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -51,56 +68,65 @@
         const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
         };
 
-        function createChart(chartId, type, datasets) {
-            let ctx = document.getElementById(chartId).getContext('2d');
-            new Chart(ctx, {
-                type: type,
-                data: {
-                    labels: labels,
-                    datasets: datasets
-                },
-                options: chartOptions
-            });
-        }
-
         // Bar Chart
-        createChart("attendanceBarChart", "bar", [{
-            label: "Attendance Data",
-            data: data,
-            backgroundColor: ["#007bff", "#28a745", "#ffc107"]
-        }]);
+        new Chart(document.getElementById("attendanceBarChart").getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Attendance Data",
+                    data: data,
+                    backgroundColor: ["#007bff", "#28a745", "#ffc107"]
+                }]
+            },
+            options: chartOptions
+        });
 
         // Line Chart
-        createChart("attendanceLineChart", "line", [{
-            label: "Attendance Trend",
-            data: data,
-            borderColor: "#007bff",
-            fill: false
-        }]);
+        new Chart(document.getElementById("attendanceLineChart").getContext("2d"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Attendance Trend",
+                    data: data,
+                    borderColor: "#007bff",
+                    backgroundColor: "rgba(0, 123, 255, 0.1)",
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: chartOptions
+        });
     });
 </script>
 
+{{-- Responsive Chart Styling --}}
 <style>
-    .charts-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 30px; /* Increased gap for better spacing */
+    .chart-wrapper {
+        position: relative;
         width: 100%;
+        height: 300px;
     }
 
-    .chart-container {
-        width: 100%;
-        max-width: 600px;
-        height: 400px;
-    }
+    @media (max-width: 576px) {
+        .chart-wrapper {
+            height: 250px;
+        }
 
-    canvas {
-        width: 100% !important;
-        height: auto !important;
+        .card-header {
+            font-size: 1rem;
+        }
     }
 </style>
 @endsection
