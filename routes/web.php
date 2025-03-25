@@ -11,6 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Exports\AttendanceExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\ShepherdController;
 
 
 
@@ -116,6 +117,19 @@ Route::get('/attendance/export-excel', function () {
 Route::resource('groups', GroupController::class);
 Route::post('/groups/{group}/addMember', [GroupController::class, 'addMember'])->name('groups.addMember');
 Route::delete('/groups/{group}/removeMember/{user}', [GroupController::class, 'removeMember'])->name('groups.removeMember');
+
+//assign attendee
+
+Route::post('/attendees/{attendee}/assign', [AttendeeController::class, 'assign'])->name('attendees.assign');
+
+
+//shepherd assigned
+Route::middleware(['auth', 'role:Shepherd'])->group(function () {
+    Route::get('/my-attendees', [ShepherdController::class, 'myAttendees'])->name('shepherd.attendees');
+});
+
+
+
 
 
 

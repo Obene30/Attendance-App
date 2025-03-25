@@ -16,6 +16,12 @@ class Attendee extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function shepherd()
+        {
+            return $this->belongsTo(User::class, 'user_id'); // assumes there's a user_id column
+        }
+
+
 }
 
 

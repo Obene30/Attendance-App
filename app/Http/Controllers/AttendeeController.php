@@ -11,6 +11,7 @@ use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Http\Controllers\AttendeeController;
 
 
 
@@ -18,11 +19,15 @@ class AttendeeController extends Controller
 {
     public function index()
     {
-        // Use paginate instead of all() to paginate the results
-        $attendees = Attendee::paginate(10);  // Change the number to whatever you need per page
+        if (auth()->user()->hasRole('Shepherd')) {
+            $attendees = Attendee::where('user_id', auth()->id())->paginate(10);
+        } else {
+            $attendees = Attendee::paginate(10);
+        }
     
         return view('attendees.index', compact('attendees'));
     }
+    
     
 
 // Show the edit form
@@ -136,6 +141,22 @@ public function destroy(Attendee $attendee)
         }
         return response()->download(storage_path('attendance.pdf'));
     }
+
+
+
+    public function assign(Request $request, Attendee $attendee)
+    {
+        $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+        ]);
+    
+        $attendee->user_id = $request->user_id;
+        $attendee->save();
+    
+        return back()->with('success', 'Shepherd assigned successfully.');
+    }
+    
+
 }
 
     

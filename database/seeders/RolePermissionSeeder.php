@@ -21,7 +21,8 @@ class RolePermissionSeeder extends Seeder
             'mark attendance',
             'export pdf',
             'view attendance',
-            'export excel'
+            'export excel',
+            'myAttendees'
         ];
 
         foreach ($permissions as $permission) {
@@ -35,8 +36,11 @@ class RolePermissionSeeder extends Seeder
 
         // Assign permissions to roles
         $admin->givePermissionTo(['manage users', 'manage attendees', 'view reports', 'mark attendance', 'export pdf']);
-        $shepherd->givePermissionTo(['manage attendees', 'view attendance', 'mark attendance']);
+        $shepherd->givePermissionTo(['manage attendees', 'view attendance', 'mark attendance', 'myAttendees']);
         $member->givePermissionTo(['mark attendance']);
     }
+
+
+    
 }
 

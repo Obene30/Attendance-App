@@ -148,7 +148,8 @@
     <ul class="nav flex-column">
         @if(auth()->user()->hasRole('Shepherd'))
             <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link text-white">🏠 Dashboard</a></li>
-           
+            <li class="nav-item"><a href="{{ route('shepherd.attendees') }}" class="nav-link text-white">👥 My Sheeps</a></li>
+
             <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link text-white">✅ Mark Attendance</a></li>
             <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link text-white">📅 View Attendance</a></li>
             <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link text-white">🚪 Logout</a></li>
