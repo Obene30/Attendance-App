@@ -41,10 +41,14 @@
                         @csrf
                         <select name="user_id" class="form-select form-select-sm" onchange="this.form.submit()">
                             <option value="">-- Assign --</option>
-                            @foreach(App\Models\User::role('Shepherd')->get() as $user)
-                                <option value="{{ $user->id }}" {{ $attendee->user_id == $user->id ? 'selected' : '' }}>
-                                    {{ $user->first_name }} {{ $user->last_name }}
-                                </option>
+                            @foreach(App\Models\User::whereHas('roles', function($q) {
+                                $q->whereIn('name', ['Shepherd', 'Admin']);
+                            })->get() as $user)
+                            
+                            <option value="{{ $user->id }}" {{ $attendee->user_id == $user->id ? 'selected' : '' }}>
+                                {{ $user->first_name }} {{ $user->last_name }} ({{ $user->getRoleNames()->first() }})
+                            </option>
+                            
                             @endforeach
                         </select>
                     </form>

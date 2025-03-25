@@ -3,11 +3,14 @@
 @section('content')
 <div class="container">
     <div class="py-4"></div>
+    {{-- Welcome Message --}}
+    <h3 class="mb-4 text-center">👋 Welcome back, {{ Auth::user()->first_name }}!</h3>
 
-    <h2 class="text-center mb-4">📊 Welcome To MSCI Armley Attendance System</h2>
+    <h2 class="text-center mb-4">MSCI Armley Attendance Software</h2>
 
     <!-- Stat Cards -->
     <div class="row g-4">
+        <h4 class="text-left mb-4">🏠 Dashboard</h5>
         <div class="col-12 col-md-4">
             <div class="card text-white bg-primary shadow p-4 h-100">
                 <h4>👥 Total Attendees</h4>
@@ -32,7 +35,9 @@
 
     <!-- Charts -->
     <div class="row g-4">
+        <h5 class="text-center mb-4">📊 Attendance Summary</h5>
         <!-- Bar Chart -->
+       
         <div class="col-12 col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white fw-semibold">
@@ -56,6 +61,41 @@
             </div>
         </div>
     </div>
+
+    {{-- 📊 Charts Section --}}
+    <div class="mt-5">
+        <h5 class="text-center mb-4">📊 Attendees Overview (Present/Absent)</h5>
+
+        <div class="row g-4">
+            <!-- Line Chart -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-success text-white fw-semibold">
+                        📈 Attendance Trend
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-info text-white fw-semibold">
+                        📉 Attendance Ratio
+                    </div>
+                    <div class="card-body d-flex justify-content-center align-items-center">
+                        <div class="chart-container" style="max-width: 300px;">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 {{-- Chart.js CDN --}}
@@ -65,15 +105,19 @@
         const labels = ["Total Attendees", "Weekly Attendance", "Monthly Attendance"];
         const data = [{{ $totalAttendees }}, {{ $weeklyAttendance }}, {{ $monthlyAttendance }}];
 
+        const summaryLabels = @json($dates);
+        const presentData = @json($statusGroups['Present']);
+        const absentData = @json($statusGroups['Absent']);
+        const totalPresent = {{ $totalPresent }};
+        const totalAbsent = {{ $totalAbsent }};
+
         const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: {
-                        precision: 0
-                    }
+                    ticks: { precision: 0 }
                 }
             }
         };
@@ -108,6 +152,49 @@
             },
             options: chartOptions
         });
+
+        // Summary Line Chart
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: summaryLabels,
+                datasets: [
+                    {
+                        label: 'Present',
+                        data: presentData,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Absent',
+                        data: absentData,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: chartOptions
+        });
+
+        // Pie Chart
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Present', 'Absent'],
+                datasets: [{
+                    data: [totalPresent, totalAbsent],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
     });
 </script>
 
@@ -118,12 +205,19 @@
         width: 100%;
         height: 300px;
     }
-
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 300px;
+    }
+    canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
     @media (max-width: 576px) {
-        .chart-wrapper {
+        .chart-wrapper, .chart-container {
             height: 250px;
         }
-
         .card-header {
             font-size: 1rem;
         }

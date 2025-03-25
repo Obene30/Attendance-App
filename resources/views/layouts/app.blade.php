@@ -115,7 +115,7 @@
             <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link">✅ Mark Attendance</a></li>
             <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link">📅 View Attendance</a></li>
 
-            <li class="nav-item"> <a href="{{ route('admin.shepherd-attendance') }}" class="nav-link">👨‍🌾 Shepherd Attendance</a></li>
+            <li class="nav-item"> <a href="{{ route('admin.shepherd-attendance') }}" class="nav-link">📉 Shepherd Attendance</a></li>
             <li class="nav-item"><a href="{{ route('groups.index') }}" class="nav-link">👤 Group Manager</a></li>
             
             <!-- Reports Dropdown -->
@@ -126,7 +126,7 @@
                 <ul class="dropdown-menu" aria-labelledby="reportDropdown">
                     <li><a class="dropdown-item" href="{{ route('attendance.report', ['period' => 'weekly']) }}">📊 Weekly Report</a></li>
                     <li><a class="dropdown-item" href="{{ route('attendance.report.monthly') }}">📆 Monthly Report</a></li>
-                    <li><a class="dropdown-item" href="{{ route('admin.shepherd.report') }}">👨‍🌾 Shepherd Report</a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.shepherd.report') }}">📉Shepherd Report</a></li>
                 </ul>
             </li>
             
@@ -151,7 +151,7 @@
     <ul class="nav flex-column">
         @if(auth()->user()->hasRole('Shepherd'))
             <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link text-white">🏠 Dashboard</a></li>
-            <li class="nav-item"><a href="{{ route('shepherd.attendees') }}" class="nav-link text-white">👥 My Attendees</a></li>
+            <li class="nav-item"><a href="{{ route('shepherd.attendees') }}" class="nav-link text-white">👥 Assigned Sheep</a></li>
 
             <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link text-white">✅ Mark Attendance</a></li>
             <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link text-white">📅 View Attendance</a></li>

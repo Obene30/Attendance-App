@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h2 class="mt-4 mb-4 text-center">👨‍🌾 Shepherd Report</h2>
+    <h2 class="mt-4 mb-4 text-center">👨 Shepherd Report</h2>
 
     @if($records->isEmpty())
         <div class="alert alert-info text-center">No attendance records found.</div>

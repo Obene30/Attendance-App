@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h2 class="mt-4">👨‍🌾 Shepherd Attendance Overview</h2>
+    <h2 class="mt-4">📉 Shepherd Attendance Overview</h2>
 
     <!-- Date Selection (optional for filtering future logic) -->
     <form method="GET" action="{{ route('admin.shepherd-attendance') }}" class="mb-4">
