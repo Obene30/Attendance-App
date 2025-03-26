@@ -66,7 +66,7 @@
             <div class="col-12 col-md-6">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-info text-white fw-semibold">
-                        🥧 Attendance Ratio
+                        📊 Attendance Ratio
                     </div>
                     <div class="card-body d-flex justify-content-center align-items-center">
                         <div class="chart-container" style="max-width: 300px;">

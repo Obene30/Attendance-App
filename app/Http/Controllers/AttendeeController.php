@@ -11,9 +11,7 @@ use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Http\Controllers\AttendeeController;
-
-
+use App\Http\Controllers\ActivityLogController;
 
 class AttendeeController extends Controller
 {
@@ -27,50 +25,45 @@ class AttendeeController extends Controller
     
         return view('attendees.index', compact('attendees'));
     }
-    
-    
 
-// Show the edit form
-public function edit(Attendee $attendee)
-{
-    return view('attendees.edit', compact('attendee'));
-}
+    // Show the edit form
+    public function edit(Attendee $attendee)
+    {
+        return view('attendees.edit', compact('attendee'));
+    }
 
-// Update the attendee's information
-public function update(Request $request, Attendee $attendee)
-{
-    $request->validate([
-        'full_name' => 'required|string',
-        'address' => 'required|string',
-        'dob' => 'required|date',
-        'sex' => 'required|string',
-        'category' => 'required|string',
-    ]);
+    // Update the attendee's information
+    public function update(Request $request, Attendee $attendee)
+    {
+        $request->validate([
+            'full_name' => 'required|string',
+            'address' => 'required|string',
+            'dob' => 'required|date',
+            'sex' => 'required|string',
+            'category' => 'required|string',
+        ]);
 
-    $attendee->update([
-        'full_name' => $request->full_name,
-        'address' => $request->address,
-        'dob' => $request->dob,
-        'sex' => $request->sex,
-        'category' => $request->category,
-    ]);
+        $attendee->update([
+            'full_name' => $request->full_name,
+            'address' => $request->address,
+            'dob' => $request->dob,
+            'sex' => $request->sex,
+            'category' => $request->category,
+        ]);
 
-    return redirect()->route('attendees.index')->with('success', 'Attendee updated successfully');
-}
+        ActivityLogController::log('update_attendee', 'Updated attendee: ' . $attendee->full_name);
 
+        return redirect()->route('attendees.index')->with('success', 'Attendee updated successfully');
+    }
 
-// app/Http/Controllers/AttendeeController.php
+    public function destroy(Attendee $attendee)
+    {
+        $attendee->delete();
 
-public function destroy(Attendee $attendee)
-{
-    $attendee->delete();
-    return redirect()->route('attendees.index')->with('success', 'Attendee deleted successfully');
-}
+        ActivityLogController::log('delete_attendee', 'Deleted attendee: ' . $attendee->full_name);
 
-
-
-
-
+        return redirect()->route('attendees.index')->with('success', 'Attendee deleted successfully');
+    }
 
     public function create()
     {
@@ -79,44 +72,31 @@ public function destroy(Attendee $attendee)
 
     public function store(Request $request)
     {
-        // Validation rules
         $request->validate([
             'full_name' => 'required|string|max:255',
             'address' => 'required|string',
-            'dob' => ['required', 'regex:/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/'], // MM-DD format
+            'dob' => ['required', 'regex:/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/'],
             'sex' => 'required|in:Male,Female',
             'category' => 'required|in:Men,Women,Children',
         ]);
     
-        // Create the new attendee
         $attendee = Attendee::create([
             'full_name' => $request->full_name,
             'address' => $request->address,
-            'dob' => $request->dob,  // Store the date in MM-DD format
+            'dob' => $request->dob,
             'sex' => $request->sex,
             'category' => $request->category,
         ]);
 
-        ActivityLog::create([
-            'user_id' => Auth::id(),
-            'action' => 'create_attendee',
-            'description' => 'Added new attendee: ' . $attendee->name,
-        ]);
+        ActivityLogController::log('create_attendee', 'Added new attendee: ' . $attendee->full_name);
     
-        // Redirect back to the index page with success message
         return redirect()->route('attendees.index')->with('success', 'Attendee added successfully!');
     }
-    
-
-
-
-   //rolebase
 
     public function __construct()
     {
-        // $this->middleware(['auth']); // Ensure user is logged in
+        // $this->middleware(['auth']);
     }
-
 
     public function logs()
     {
@@ -142,22 +122,17 @@ public function destroy(Attendee $attendee)
         return response()->download(storage_path('attendance.pdf'));
     }
 
-
-
     public function assign(Request $request, Attendee $attendee)
     {
         $request->validate([
             'user_id' => 'nullable|exists:users,id',
         ]);
-    
+
         $attendee->user_id = $request->user_id;
         $attendee->save();
-    
+
+        ActivityLogController::log('assign_attendee', 'Assigned shepherd to attendee: ' . $attendee->full_name);
+
         return back()->with('success', 'Shepherd assigned successfully.');
     }
-    
-
 }
-
-    
-

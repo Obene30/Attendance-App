@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="container">
-    <h2 class="mt-4">📉 Shepherd Attendance Overview</h2>
+    <h2 class="mt-4">📉 Shepherd Attendance Log</h2>
+
 
     <!-- Date Selection (optional for filtering future logic) -->
     <form method="GET" action="{{ route('admin.shepherd-attendance') }}" class="mb-4">
@@ -24,6 +25,7 @@
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-primary text-white">
                     {{ $shepherd->first_name }} {{ $shepherd->last_name }} ({{ $shepherd->email }})
+                    {{ $shepherd->getRoleNames()->first() }}
                 </div>
                 <div class="card-body p-0">
                     @if($shepherd->attendances->isEmpty())

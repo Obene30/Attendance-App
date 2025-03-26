@@ -14,7 +14,7 @@ class AdminController extends Controller
 
     public function shepherdReport()
     {
-        $records = Attendance::with(['attendee', 'markedBy'])->latest()->paginate(20);
+        $records = Attendance::with(['attendee', 'markedBy'])->latest()->paginate(10);
     
         // Prepare data for charts
         $allData = Attendance::selectRaw('date, status, COUNT(*) as total')
@@ -38,34 +38,32 @@ class AdminController extends Controller
         return view('admin.shepherd-report', compact('records', 'dates', 'statusGroups', 'totalPresent', 'totalAbsent'));
     }
     
-
-public function viewShepherdAttendance(Request $request)
+    public function viewShepherdAttendance(Request $request)
 {
-    // ✅ Role check
-    if (!Auth::user()->hasRole('Admin')) {
-        abort(403, 'Unauthorized access');
-    }
-
     $date = $request->input('date');
 
-    // ✅ Get all shepherds
-    $shepherds = User::role('Shepherd')->get();
+    $users = User::whereHas('roles', function ($query) {
+        $query->whereIn('name', ['Shepherd', 'Admin']);
+    })->get();
 
-    foreach ($shepherds as $shepherd) {
-        $query = $shepherd->attendances()->with('attendee')->latest();
+    foreach ($users as $user) {
+        $query = $user->attendances()->with('attendee')->latest();
 
         if ($date) {
             $query->whereDate('date', $date);
         }
 
-        // ✅ Paginate attendances and set relation
-        $shepherd->setRelation(
+        // paginate each user's attendance records
+        $user->setRelation(
             'attendances',
-            $query->paginate(5, ['*'], "page_shepherd_{$shepherd->id}")
+            $query->paginate(5, ['*'], "page_user_{$user->id}")
         );
     }
 
-    return view('admin.shepherd-attendance', compact('shepherds'));
+    // ✅ Log the view action
+    \App\Http\Controllers\ActivityLogController::log('shepherd_attendance', 'Viewed shepherds\' attendance.');
+
+    return view('admin.shepherd-attendance', ['shepherds' => $users]);
 }
 
 

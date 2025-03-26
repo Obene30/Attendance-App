@@ -35,7 +35,7 @@ class RolePermissionSeeder extends Seeder
         $member = Role::firstOrCreate(['name' => 'Member']);
 
         // Assign permissions to roles
-        $admin->givePermissionTo(['manage users', 'manage attendees', 'view reports', 'mark attendance', 'export pdf']);
+        $admin->givePermissionTo(['manage users', 'manage attendees', 'view reports', 'mark attendance', 'export pdf', 'Activity Logs']);
         $shepherd->givePermissionTo(['manage attendees', 'view attendance', 'mark attendance', 'myAttendees']);
         $member->givePermissionTo(['mark attendance']);
     }
