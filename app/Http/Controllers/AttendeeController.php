@@ -26,30 +26,35 @@ class AttendeeController extends Controller
         return view('attendees.index', compact('attendees'));
     }
 
-    // Show the edit form
-    public function edit(Attendee $attendee)
-    {
-        return view('attendees.edit', compact('attendee'));
+   // Show the edit form
+public function edit(Attendee $attendee)
+{
+    // Format the DOB to MM-DD for display
+    if ($attendee->dob && strlen($attendee->dob) === 10) {
+        $attendee->dob = \Carbon\Carbon::parse($attendee->dob)->format('m-d');
     }
 
-    // Update the attendee's information
-    public function update(Request $request, Attendee $attendee)
-    {
-        $request->validate([
-            'full_name' => 'required|string',
-            'address' => 'required|string',
-            'dob' => 'required|date',
-            'sex' => 'required|string',
-            'category' => 'required|string',
-        ]);
+    return view('attendees.edit', compact('attendee'));
+}
 
-        $attendee->update([
-            'full_name' => $request->full_name,
-            'address' => $request->address,
-            'dob' => $request->dob,
-            'sex' => $request->sex,
-            'category' => $request->category,
-        ]);
+// Update the attendee's information
+public function update(Request $request, Attendee $attendee)
+{
+    $request->validate([
+        'full_name' => 'required|string',
+        'address' => 'required|string',
+        'dob' => ['required', 'regex:/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/'], // MM-DD format
+        'sex' => 'required|string',
+        'category' => 'required|string',
+    ]);
+
+    $attendee->update([
+        'full_name' => $request->full_name,
+        'address' => $request->address,
+        'dob' => $request->dob, // store only MM-DD
+        'sex' => $request->sex,
+        'category' => $request->category,
+    ]);
 
         ActivityLogController::log('update_attendee', 'Updated attendee: ' . $attendee->full_name);
 

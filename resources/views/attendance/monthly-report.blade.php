@@ -43,7 +43,8 @@
     <div class="col-md-6">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-warning text-dark fw-semibold">
-                🥧 Attendance Pie Chart
+                📈 Attendance Pie Chart
+               
             </div>
             <div class="card-body d-flex justify-content-center">
                 <canvas id="attendancePieChart" style="max-width: 100%; height: 300px;"></canvas>

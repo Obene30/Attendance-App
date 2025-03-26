@@ -10,7 +10,7 @@
 
     <!-- Stat Cards -->
     <div class="row g-4">
-        <h4 class="text-left mb-4">🏠 Dashboard</h5>
+        <h4 class="text-left mb-4">Dashboard ⛪</h5>
         <div class="col-12 col-md-4">
             <div class="card text-white bg-primary shadow p-4 h-100">
                 <h4>👥 Total Attendees</h4>

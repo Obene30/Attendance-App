@@ -1,39 +1,42 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2 class="mt-4 mb-4 text-center">✏️ Edit Group: <strong>{{ $group->name }}</strong></h2>
-
-    {{-- Success Message --}}
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    {{-- Error Message --}}
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
-    {{-- Validation Errors --}}
-    @if($errors->any())
-        <div class="alert alert-danger">
-            <strong>Please fix the following errors:</strong>
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+<div class="container py-4">
+    <div class="card shadow border-0">
+        <div class="card-header bg-warning text-dark fw-bold">
+            <h4 class="mb-0">✏️ Edit Group: <strong>{{ $group->name }}</strong></h4>
         </div>
-    @endif
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
+        <div class="card-body bg-light">
+
+            {{-- Success Message --}}
+            @if(session('success'))
+                <div class="alert alert-success text-center">{{ session('success') }}</div>
+            @endif
+
+            {{-- Error Message --}}
+            @if(session('error'))
+                <div class="alert alert-danger text-center">{{ session('error') }}</div>
+            @endif
+
+            {{-- Validation Errors --}}
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <strong>⚠️ Please fix the following errors:</strong>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('groups.update', $group) }}">
                 @csrf
                 @method('PUT')
 
                 {{-- Group Name --}}
-                <div class="form-group mb-4">
+                <div class="mb-3">
                     <label for="name" class="form-label fw-semibold">📝 Group Name</label>
                     <input
                         type="text"
@@ -47,7 +50,7 @@
                 </div>
 
                 {{-- Add Members --}}
-                <div class="form-group mb-4">
+                <div class="mb-4">
                     <label for="user_names" class="form-label fw-semibold">
                         👥 Add Members by Full Name <small class="text-muted">(comma separated)</small>
                     </label>
@@ -62,8 +65,12 @@
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <button class="btn btn-primary">✅ Update Group</button>
-                    <a href="{{ route('groups.index') }}" class="btn btn-outline-secondary">← Back to Groups</a>
+                    <button class="btn btn-warning text-dark fw-semibold">
+                        ✅ Update Group
+                    </button>
+                    <a href="{{ route('groups.index') }}" class="btn btn-outline-secondary">
+                        ← Back to Groups
+                    </a>
                 </div>
             </form>
 
@@ -75,7 +82,7 @@
                     @foreach ($group->users as $user)
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div>
-                                {{ $user->first_name }} {{ $user->last_name }}
+                                <strong>{{ $user->first_name }} {{ $user->last_name }}</strong>
                                 <span class="text-muted d-block small">{{ $user->email }}</span>
                             </div>
                             <span class="badge bg-secondary">{{ $user->id }}</span>
@@ -86,4 +93,19 @@
         </div>
     </div>
 </div>
+
+<style>
+    .form-control:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+    }
+</style>
 @endsection
