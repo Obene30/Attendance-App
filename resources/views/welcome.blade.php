@@ -14,14 +14,14 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', sans-serif;
-            background-color: #fdf6e3;
+            background-color: #fef9e7;
             color: #333;
         }
 
         .hero {
             height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0,0,0,0.4)), 
-                        url('{{ asset('images/doug-vos-N3kdvLgARuw-unsplash.jpg') }}') center/cover no-repeat;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0,0,0,0.4)),
+                        url('{{ asset('/images/natalia-y--hrKlTEauoI-unsplash copy.jpg') }}') center center / cover no-repeat;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -30,16 +30,47 @@
             color: #fff;
             padding: 2rem;
         }
-
-        .hero h1 {
+                .hero h1 {
             font-size: 3rem;
             font-weight: 700;
             margin-bottom: 1rem;
+            color: #ffdb58;
+            text-shadow: 1px 1px 2px #000;
+            animation: bounce 1.5s ease-in-out infinite;
         }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+                .logo-animate {
+            animation: moveRight 5s ease-in-out infinite;
+            width: 80px;
+        }
+
+        @keyframes moveRight {
+            0% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(100px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+
 
         .hero p {
             font-size: 1.25rem;
             margin-bottom: 2rem;
+            color: #fff9c4;
         }
 
         .btn-custom {
@@ -55,23 +86,23 @@
         }
 
         .btn-custom:hover {
-            background-color: #fff8dc;
+            background-color: #fce275;
             transform: translateY(-2px);
         }
 
         .logo-container {
             position: absolute;
-            top: 30px;
-            left: 30px;
+            top: 20px;
+            left: 20px;
         }
 
         .logo-container img {
-            width: 90px;
+            width: 80px;
         }
 
         .footer {
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             text-align: center;
             color: #fff;
             font-size: 0.9rem;
@@ -99,7 +130,11 @@
             }
 
             .logo-container img {
-                width: 70px;
+                width: 60px;
+            }
+
+            .hero {
+                padding: 1.5rem;
             }
         }
     </style>
@@ -108,13 +143,13 @@
 
     <!-- Logo -->
     <div class="logo-container">
-        <img src="{{ asset('images/PHOTO-2025-03-04-20-14-01-removebg-preview.png') }}" alt="Church Logo">
+        <img src="{{ asset('images/PHOTO-2025-03-04-20-14-01-removebg-preview.png') }}" alt="Church Logo" class="logo-animate">
     </div>
 
     <!-- Hero Section -->
     <div class="hero">
         <h1>Welcome to MSCI Armley</h1>
-        <p>Smart and simple church attendance system.</p>
+        <p>Church management system made simple and impactful.</p>
         <a href="{{ route('login') }}" class="btn-custom">🚀 Get Started</a>
 
         <div class="footer">
