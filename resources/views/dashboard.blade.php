@@ -10,7 +10,7 @@
 
     <!-- Stat Cards -->
     <div class="row g-4">
-        <h4 class="text-left mb-4">Dashboard ⛪</h5>
+        <h4 class="text-left mb-4">🏠 Dashboard</h5>
         <div class="col-12 col-md-4">
             <div class="card text-white bg-primary shadow p-4 h-100">
                 <h4>👥 Total Attendees</h4>
@@ -30,6 +30,66 @@
             </div>
         </div>
     </div>
+
+
+{{-- Shepherd & Admin Overview --}}
+<div class="mt-5">
+    <h5 class="text-center mb-4">👥 Shepherd Insight</h5>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark fw-semibold">
+            <i class="bi bi-person-check-fill"></i> Assigned Attendees Summary
+        </div>
+        <div class="card-body bg-light">
+            @if($assignedUsers->isEmpty())
+                <div class="alert alert-warning text-center mb-0">
+                    No Shepherds or Admins with assigned attendees found.
+                </div>
+            @else
+            <div class="table-responsive">
+                <table id="overviewTable" class="table table-bordered align-middle table-striped">
+                    <thead class="table-warning text-dark text-center">
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Assigned Sheep</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($assignedUsers as $index => $user)
+                            <tr class="text-center">
+                                <td>{{ $index + 1 }}</td>
+                                <td class="text-start">
+                                    {{ $user->first_name }} {{ $user->last_name }}
+                                </td>
+                                <td>
+                                    <span class="fw-bold">{{ $user->assigned_attendees_count }}</span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        $('#overviewTable').DataTable({
+                            paging: true,
+                            ordering: true,
+                            info: false,
+                            language: {
+                                search: "🔍 Filter:"
+                            }
+                        });
+                    });
+                </script>
+                
+            </div>
+            
+            @endif
+        </div>
+    </div>
+</div>
+
+
+
 
     <div class="py-4"></div>
 

@@ -41,17 +41,29 @@
                     <div class="card-body bg-white">
                         <h6 class="mb-3 text-muted">👥 Members:</h6>
 
-                        @if ($group->users->isEmpty())
+                        @if ($group->users->isEmpty() && $group->externalMembers->isEmpty())
                             <div class="alert alert-warning mb-0">No members yet.</div>
                         @else
                             <ul class="list-group">
+                                {{-- Internal Users --}}
                                 @foreach ($group->users as $user)
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         <div>
                                             <strong>{{ $user->first_name }} {{ $user->last_name }}</strong>
                                             <span class="text-muted d-block small">{{ $user->email }}</span>
                                         </div>
-                                        <span class="badge bg-secondary">ID: {{ $user->id }}</span>
+                                        <span class="badge bg-secondary">User</span>
+                                    </li>
+                                @endforeach
+
+                                {{-- External Members --}}
+                                @foreach ($group->externalMembers as $ext)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ $ext->name }}</strong>
+                                            <span class="text-muted d-block small">External Member</span>
+                                        </div>
+                                        <span class="badge bg-info">External</span>
                                     </li>
                                 @endforeach
                             </ul>

@@ -156,3 +156,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/shepherd-attendance', [AdminController::class, 'viewShepherdAttendance'])
         ->name('admin.shepherd-attendance');
 });
+
+Route::delete('/groups/{group}/remove-user/{user}', [GroupController::class, 'removeUser'])->name('groups.removeUser');
+Route::delete('/groups/{group}/remove-external/{external}', [GroupController::class, 'removeExternalMember'])->name('groups.removeExternalMember');
+
+Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');

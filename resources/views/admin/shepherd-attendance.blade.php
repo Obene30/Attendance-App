@@ -27,12 +27,25 @@
                 <div class="alert alert-info text-center">No shepherds have marked attendance yet.</div>
             @else
                 @foreach($shepherds as $shepherd)
-                <div class="card mb-4 shadow-sm border-0">
-                    <div class="card-header text-white fw-semibold" style="background-color: #6f4e37;">
-                        {{ $shepherd->first_name }} {{ $shepherd->last_name }} ({{ $shepherd->email }}) -
-                        <span class="badge bg-light text-dark">{{ $shepherd->getRoleNames()->first() }}</span>
-                    </div>
-                
+                    @php
+                        $selectedDate = request('date') ?? now()->toDateString();
+                        $weekStart = \Carbon\Carbon::parse($selectedDate)->startOfWeek();
+                        $weekEnd = \Carbon\Carbon::parse($selectedDate)->endOfWeek();
+
+                        $assignedCount = $shepherd->attendees()->count();
+                        $markedCount = $shepherd->attendances()
+                            ->whereBetween('date', [$weekStart, $weekEnd])
+                            ->distinct('attendee_id') // avoid duplicate marks
+                            ->count('attendee_id');
+                    @endphp
+
+                    <div class="card mb-4 shadow-sm border-0">
+                        <div class="card-header text-white fw-semibold" style="background-color: #6f4e37;">
+                            {{ $shepherd->first_name }} {{ $shepherd->last_name }} ({{ $shepherd->email }})
+                            <span class="badge bg-light text-dark">{{ $shepherd->getRoleNames()->first() }}</span>
+                            <span class="badge bg-info text-white float-end">Marked: {{ $markedCount }} / {{ $assignedCount }}</span>
+                        </div>
+
                         <div class="card-body p-0">
                             @if($shepherd->attendances->isEmpty())
                                 <div class="p-3 text-muted">No attendance records from this user.</div>
@@ -56,8 +69,8 @@
                                                     <td>{{ $record->attendee->category }}</td>
                                                     <td>
                                                         <span class="badge {{ $record->status === 'Present' ? 'bg-success' : 'bg-danger' }}"
-                                                              data-bs-toggle="tooltip"
-                                                              title="{{ $record->status === 'Present' ? 'Marked as Present' : 'Marked as Absent' }}">
+                                                            data-bs-toggle="tooltip"
+                                                            title="{{ $record->status === 'Present' ? 'Marked as Present' : 'Marked as Absent' }}">
                                                             {{ $record->status }}
                                                         </span>
                                                     </td>
@@ -80,19 +93,15 @@
     </div>
 </div>
 
-<!-- Optional Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
+<!-- Enable tooltips -->
 <script>
-    // Enable tooltips
     document.addEventListener("DOMContentLoaded", function () {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.forEach(function (el) {
-            new bootstrap.Tooltip(el)
+            new bootstrap.Tooltip(el);
         });
     });
 </script>
 
-
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 @endsection

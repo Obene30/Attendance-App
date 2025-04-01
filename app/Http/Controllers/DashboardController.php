@@ -39,6 +39,11 @@ class DashboardController extends Controller
             $statusGroups['Absent'][] = Attendance::whereDate('date', $originalDate)->where('status', 'Absent')->count();
         }
 
+         // Get users with assigned attendees
+         $assignedUsers = User::whereHas('roles', function ($q) {
+            $q->whereIn('name', ['Shepherd', 'Admin']);
+        })->withCount('assignedAttendees')->get();
+
         // Summary totals
         $totalPresent = array_sum($statusGroups['Present']);
         $totalAbsent = array_sum($statusGroups['Absent']);
@@ -47,6 +52,7 @@ class DashboardController extends Controller
             'totalAttendees',
             'weeklyAttendance',
             'monthlyAttendance',
+            'assignedUsers',
             'dates',
             'statusGroups',
             'totalPresent',

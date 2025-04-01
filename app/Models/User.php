@@ -18,10 +18,22 @@ class User extends Authenticatable
         return $this->belongsToMany(Group::class);
     }
 
-    public function attendances()
+        public function attendances()
+    {
+        return $this->hasMany(\App\Models\Attendance::class, 'marked_by');
+    }
+
+    public function attendees()
+    {
+        return $this->hasMany(\App\Models\Attendee::class, 'user_id');
+    }
+
+    public function assignedAttendees()
 {
-    return $this->hasMany(\App\Models\Attendance::class, 'marked_by');
+    return $this->hasMany(\App\Models\Attendee::class, 'user_id');
 }
+
+
 
     /**
      * The attributes that are mass assignable.
