@@ -10,28 +10,61 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        body {
+        html, body {
+            height: 100%;
             margin: 0;
-            padding: 0;
             font-family: 'Segoe UI', sans-serif;
-            background-color: #fef9e7;
-            color: #333;
+        }
+
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            background-color: #ffdb58;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.8s ease-out;
+        }
+
+        #splash-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         .hero {
-            height: 100vh;
+            flex: 1 0 auto;
             background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0,0,0,0.4)),
                         url('{{ asset('/images/natalia-y--hrKlTEauoI-unsplash copy.jpg') }}') center center / cover no-repeat;
+            animation: backgroundPan 20s linear infinite;
+            background-size: 110%;
+            color: #fff;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            color: #fff;
-            padding: 2rem;
         }
-                .hero h1 {
-            font-size: 3rem;
+
+        @keyframes backgroundPan {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
             color: #ffdb58;
@@ -40,35 +73,12 @@
         }
 
         @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
-
-                .logo-animate {
-            animation: moveRight 5s ease-in-out infinite;
-            width: 80px;
-        }
-
-        @keyframes moveRight {
-            0% {
-                transform: translateX(0);
-            }
-            50% {
-                transform: translateX(100px);
-            }
-            100% {
-                transform: translateX(0);
-            }
-        }
-
-
 
         .hero p {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             margin-bottom: 2rem;
             color: #fff9c4;
         }
@@ -97,20 +107,20 @@
         }
 
         .logo-container img {
-            width: 80px;
+            width: 70px;
         }
 
         .footer {
-            position: absolute;
-            bottom: 15px;
+            background-color: #ffdb58;
+            padding: 12px 0;
             text-align: center;
-            color: #fff;
             font-size: 0.9rem;
-            width: 100%;
+            color: #333;
+            flex-shrink: 0;
         }
 
         .footer a {
-            color: #ffdb58;
+            color: #0b6ef0;
             text-decoration: none;
             font-weight: 500;
         }
@@ -119,43 +129,66 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
+        @media (max-width: 576px) {
+            .hero {
+                padding: 1.5rem;
             }
-
+            .hero h1 {
+                font-size: 1.8rem;
+            }
             .btn-custom {
                 padding: 10px 20px;
                 font-size: 1rem;
             }
-
             .logo-container img {
-                width: 60px;
-            }
-
-            .hero {
-                padding: 1.5rem;
+                width: 50px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Logo -->
-    <div class="logo-container">
-        <img src="{{ asset('images/PHOTO-2025-03-04-20-14-01-removebg-preview.png') }}" alt="Church Logo" class="logo-animate">
-    </div>
-
-    <!-- Hero Section -->
-    <div class="hero">
-        <h1>Welcome to MSCI Armley</h1>
-        <p>Church management system made simple and impactful.</p>
-        <a href="{{ route('login') }}" class="btn-custom">🚀 Get Started</a>
-
-        <div class="footer">
-            Powered by <a href="https://www.tech-premier.com" target="_blank">Tech Premier LTD</a>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="{{ asset('images/PHOTO-2025-03-04-20-14-01-removebg-preview.png') }}" alt="Loading Logo" style="width: 90px; margin-bottom: 20px;">
+        <div class="spinner-border text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
     </div>
+
+    <!-- Main Content -->
+    <div class="main-content" style="display: none;">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="logo-container">
+                <img src="{{ asset('images/PHOTO-2025-03-04-20-14-01-removebg-preview.png') }}" alt="Church Logo">
+            </div>
+
+            <h1>Welcome to MSCI Armley</h1>
+            <p>Church management system made simple and impactful.</p>
+            <a href="{{ route('login') }}" class="btn-custom">🚀 Get Started</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Powered by <a href="https://www.tech-premier.com" target="_blank">Tech Premier</a>
+        </div>
+    </div>
+
+    <!-- Splash Script -->
+    <script>
+        window.addEventListener('load', () => {
+            const splash = document.getElementById('splash-screen');
+            const main = document.querySelector('.main-content');
+            setTimeout(() => {
+                splash.classList.add('fade-out');
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    main.style.display = 'flex';
+                }, 800);
+            }, 1500);
+        });
+    </script>
 
 </body>
 </html>
