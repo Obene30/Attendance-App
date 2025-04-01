@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Church Attendance</title>
+    <title>Welcome | MSCI Church Attendance</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,79 +11,96 @@
 
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #ffdb58; /* Golden Yellow Background */
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #fdf6e3;
+            color: #333;
         }
 
-        /* Hero Section */
         .hero {
-            position: relative;
             height: 100vh;
-            background: url('{{ asset('images/doug-vos-N3kdvLgARuw-unsplash.jpg') }}') center/cover no-repeat;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0,0,0,0.4)), 
+                        url('{{ asset('images/doug-vos-N3kdvLgARuw-unsplash.jpg') }}') center/cover no-repeat;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: white;
             text-align: center;
+            color: #fff;
+            padding: 2rem;
         }
-        .hero::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Dark overlay for better text visibility */
-        }
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
+
         .hero h1 {
-            font-size: 50px;
-            font-weight: bold;
-            margin-bottom: 20px;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
         }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
         .btn-custom {
-            background: #ffdb58;
-            color: black;
-            padding: 12px 24px;
-            font-size: 18px;
+            background-color: #ffdb58;
+            color: #000;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
             border-radius: 8px;
             text-decoration: none;
-            transition: 0.3s;
+            transition: all 0.3s ease-in-out;
+            border: none;
         }
+
         .btn-custom:hover {
-            background: #f0f8ff;
+            background-color: #fff8dc;
+            transform: translateY(-2px);
         }
 
-        /* Carousel */
-        .carousel img {
-            height: 70vh;
-            object-fit: cover;
-        }
-
-        /* Logo */
         .logo-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .logo-container img {
-            width: 100px;
+            position: absolute;
+            top: 30px;
+            left: 30px;
         }
 
-        /* Footer */
+        .logo-container img {
+            width: 90px;
+        }
+
         .footer {
+            position: absolute;
+            bottom: 20px;
             text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
+            color: #fff;
+            font-size: 0.9rem;
+            width: 100%;
         }
+
         .footer a {
-            color: white;
+            color: #ffdb58;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
         }
+
         .footer a:hover {
             text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .btn-custom {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+
+            .logo-container img {
+                width: 70px;
+            }
         }
     </style>
 </head>
@@ -96,21 +113,14 @@
 
     <!-- Hero Section -->
     <div class="hero">
-        <div class="hero-content">
-            <h1>Welcome to MSCI Armley Church Attendance System</h1>
-            <p>Track and manage church attendance efficiently.</p>
-            <div class="divider"></div>
-            <a href="{{ route('login') }}" class="btn-custom">Get Started</a>
-            <div class="divider"></div>
-            <div class="divider"></div>
-            <div class="divider"></div>
-            <p class="footer">
-                Powered by <a href="https://www.tech-premier.com" target="_blank">Tech Premier LTD</a>
-            </p>
+        <h1>Welcome to MSCI Armley</h1>
+        <p>Smart and simple church attendance system.</p>
+        <a href="{{ route('login') }}" class="btn-custom">🚀 Get Started</a>
+
+        <div class="footer">
+            Powered by <a href="https://www.tech-premier.com" target="_blank">Tech Premier LTD</a>
         </div>
     </div>
-
-
 
 </body>
 </html>
