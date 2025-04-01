@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ShepherdController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 
 
 
@@ -161,3 +162,6 @@ Route::delete('/groups/{group}/remove-user/{user}', [GroupController::class, 're
 Route::delete('/groups/{group}/remove-external/{external}', [GroupController::class, 'removeExternalMember'])->name('groups.removeExternalMember');
 
 Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
+
+Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+Route::post('/users/store', [UserController::class, 'store'])->name('users.store');

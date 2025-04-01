@@ -18,6 +18,7 @@ class User extends Authenticatable
         return $this->belongsToMany(Group::class);
     }
 
+    
         public function attendances()
     {
         return $this->hasMany(\App\Models\Attendance::class, 'marked_by');

@@ -103,7 +103,7 @@
             <li class="nav-item"><a href="{{ route('attendees.index') }}" class="nav-link">👥 Attendees Manager</a></li>
             <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link">✅ Mark Attendance</a></li>
             <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link">📅 View Attendance</a></li>
-            <li class="nav-item"><a href="{{ route('admin.shepherd-attendance') }}" class="nav-link">📉 Shepherd Attendance</a></li>
+            <li class="nav-item"><a href="{{ route('admin.shepherd-attendance') }}" class="nav-link">📉 All Shepherd Log</a></li>
             <li class="nav-item"><a href="{{ route('groups.index') }}" class="nav-link">👤 Group Manager</a></li>
 
             <li class="nav-item dropdown">
@@ -114,6 +114,8 @@
                     <li><a class="dropdown-item" href="{{ route('admin.shepherd.report') }}">📉 Shepherd Report</a></li>
                 </ul>
             </li>
+            <li class="nav-item"><a href="{{ route('users.create') }}" class="nav-link">👤 Create User</a></li>
+
 
             <li class="nav-item"><a href="{{ route('attendance.logs') }}" class="nav-link">📄 Activity Logs</a></li>
 
