@@ -41,10 +41,16 @@ class ActivityLogController extends Controller
      */
     public static function log($action, $description)
     {
+        // Skip logging if there's no authenticated user (e.g., public attendee form)
+        if (!Auth::check()) {
+            return;
+        }
+    
         ActivityLog::create([
             'user_id' => Auth::id(),
             'action' => $action,
             'description' => $description,
         ]);
     }
+    
 }

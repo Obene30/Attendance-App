@@ -165,3 +165,8 @@ Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.
 
 Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
 Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
+
+
+//attendee form route
+Route::get('/attendee/register', [AttendeeController::class, 'showForm'])->name('attendee.form');
+Route::post('/attendee/register', [AttendeeController::class, 'store'])->name('attendee.store');
