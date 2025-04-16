@@ -40,13 +40,25 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="category" class="form-label fw-semibold">📂 Category</label>
+                    <input type="text" name="category" id="category" class="form-control"
+                        value="{{ old('category', $group->category) }}" placeholder="e.g. Men, Women, Youths">
+                </div>
+
+                <div class="mb-3">
+                    <label for="subcategories" class="form-label fw-semibold">🏷️ Subcategories</label>
+                    <input type="text" name="subcategories" id="subcategories" class="form-control"
+                        value="{{ old('subcategories', $group->subcategories ? $group->subcategories->pluck('name')->implode(', ') : '') }}"
+                        placeholder="Comma-separated (e.g. Ushers, Choir, Protocol)">
+                </div>
+
+                <div class="mb-3">
                     <label for="user_names" class="form-label fw-semibold">
                         👥 Add Internal Members 
                         <small class="text-muted d-block">
                             Use full name, username or email (comma separated)
                         </small>
                     </label>
-                    
                     <input type="text" name="user_names" id="user_names" class="form-control"
                         value="{{ implode(', ', $group->users->map(fn($u) => $u->first_name . ' ' . $u->last_name)->toArray()) }}"
                         placeholder="e.g. John Doe, Jane Smith">
@@ -66,10 +78,10 @@
                 </div>
             </form>
 
-            {{-- Internal Members --}}
-            @if ($group->users->count())
+            {{-- Current Members --}}
+            @if ($group->users->count() > 0 || $group->externalMembers->count() > 0)
                 <hr>
-                <h6 class="text-muted mt-4">🧑‍🤝‍🧑 Current Internal Members:</h6>
+                <h6 class="text-muted mt-4">🧑‍🤝‍🧑 Current Members:</h6>
                 <ul class="list-group mb-3">
                     @foreach ($group->users as $user)
                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -77,87 +89,41 @@
                                 <strong>{{ $user->first_name }} {{ $user->last_name }}</strong>
                                 <span class="text-muted d-block small">{{ $user->email }}</span>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-secondary">User #{{ $user->id }}</span>
-                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                    data-bs-target="#confirmDeleteModal"
-                                    data-user-id="{{ $user->id }}"
-                                    data-user-name="{{ $user->first_name }} {{ $user->last_name }}"
-                                    data-type="internal">❌ Remove</button>
-                            </div>
+                            <form method="POST" action="{{ route('groups.remove-user', [$group->id, $user->id]) }}" onsubmit="return confirm('Are you sure you want to remove this internal member?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">❌ Remove</button>
+                            </form>
+                        </li>
+                    @endforeach
+                    @foreach ($group->externalMembers as $ext)
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>{{ $ext->name }}</strong>
+                            <form method="POST" action="{{ route('groups.remove-external', [$group->id, $ext->id]) }}" onsubmit="return confirm('Are you sure you want to remove this external member?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">❌ Remove</button>
+                            </form>
                         </li>
                     @endforeach
                 </ul>
             @endif
 
-            {{-- External Members --}}
-            @if ($group->externalMembers->count())
-                <h6 class="text-muted mt-4">🌐 External Members:</h6>
-                <ul class="list-group mb-3">
-                    @foreach ($group->externalMembers as $ext)
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>{{ $ext->name }}</strong>
-                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                data-bs-target="#confirmDeleteModal"
-                                data-user-id="{{ $ext->id }}"
-                                data-user-name="{{ $ext->name }}"
-                                data-type="external">❌ Remove</button>
-                        </li>
-                    @endforeach
-                </ul>
+            {{-- Subcategories --}}
+            @if ($group->subcategories && $group->subcategories->count())
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">📂 Subcategories</label>
+                    <ul class="list-group">
+                        @foreach ($group->subcategories as $sub)
+                            <li class="list-group-item">{{ $sub->name }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
         </div>
     </div>
 </div>
-
-<!-- Confirm Delete Modal -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="deleteMemberForm" method="POST">
-            @csrf
-            @method('DELETE')
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Removal</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to remove <strong id="modalMemberName"></strong> from the group?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
-                    <button type="submit" class="btn btn-danger">Yes, Remove</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Delete Modal Script -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const deleteModal = document.getElementById('confirmDeleteModal');
-        const form = document.getElementById('deleteMemberForm');
-        const modalName = document.getElementById('modalMemberName');
-
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const userId = button.getAttribute('data-user-id');
-            const userName = button.getAttribute('data-user-name');
-            const type = button.getAttribute('data-type');
-
-            modalName.textContent = userName;
-
-            const url = type === 'internal'
-                ? `{{ url('groups/' . $group->id . '/remove-user') }}/${userId}`
-                : `{{ url('groups/' . $group->id . '/remove-external') }}/${userId}`;
-
-            form.action = url;
-        });
-    });
-</script>
 
 <style>
     .form-control:focus {

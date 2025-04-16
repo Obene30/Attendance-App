@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Subcategory;
+
 
 
 class Group extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'category', 'subcategories'];
 
     public function users()
     {
@@ -19,5 +21,11 @@ class Group extends Model
 {
     return $this->hasMany(ExternalMember::class);
 }
+
+public function subcategories()
+{
+    return $this->hasMany(Subcategory::class);
+}
+
 
 }

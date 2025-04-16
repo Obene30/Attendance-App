@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Attendee;
+use App\Models\User;
+use App\Models\Visitation;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ActivityLogController;
@@ -24,11 +26,45 @@ class AttendeeController extends Controller
         if (auth()->user()->hasRole('Shepherd')) {
             $attendees = Attendee::where('user_id', auth()->id())->paginate(10);
         } else {
-            $attendees = Attendee::paginate(10);
+            $attendees = Attendee::paginate(15);
         }
 
         return view('attendees.index', compact('attendees'));
     }
+
+
+    public function shepherdVisitations()
+    {
+        $visitations = \App\Models\Visitation::with('attendee')
+            ->where('shepherd_id', auth()->id())
+            ->latest()
+            ->get();
+    
+        return view('shepherd.visitations', compact('visitations')); // ✅ FIXED: use 'visitations'
+    }
+    
+    public function allVisitations(Request $request)
+    {
+        $query = \App\Models\Visitation::with(['attendee', 'shepherd']);
+    
+        if ($request->filled('shepherd')) {
+            $query->whereHas('shepherd', function ($q) use ($request) {
+                $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$request->shepherd}%"]);
+            });
+        }
+    
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+    
+        $visitations = $query->latest()->paginate(10);
+    
+        return view('admin.visitation-report', compact('visitations'));
+    }
+    
+    
+
+
 
     public function create()
     {
@@ -117,17 +153,11 @@ class AttendeeController extends Controller
         return response()->download(storage_path('attendance.pdf'));
     }
 
-    /**
-     * Show public attendee registration form
-     */
     public function showForm()
     {
         return view('attendees.register');
     }
 
-    /**
-     * Handle public form submission
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -149,5 +179,42 @@ class AttendeeController extends Controller
         ActivityLogController::log('create_attendee', 'Added new attendee: ' . $attendee->full_name);
 
         return redirect()->back()->with('success', '🎉 Registration successful!, Thank you!');
+    }
+
+    public function requestVisitation(Request $request, Attendee $attendee)
+    {
+        $request->validate([
+            'shepherd_id' => 'required|exists:users,id',
+            'admin_comment' => 'nullable|string|max:1000',
+        ]);
+
+        Visitation::updateOrCreate(
+            ['attendee_id' => $attendee->id],
+            [
+                'shepherd_id' => $request->shepherd_id,
+                'admin_comment' => $request->admin_comment,
+                'status' => 'Pending',
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Visitation request sent.');
+    }
+
+    public function completeVisitation(Request $request, Attendee $attendee)
+    {
+        $request->validate([
+            'shepherd_comment' => 'nullable|string|max:1000',
+        ]);
+
+        $visitation = Visitation::where('attendee_id', $attendee->id)
+            ->where('shepherd_id', auth()->id())
+            ->firstOrFail();
+
+        $visitation->update([
+            'shepherd_comment' => $request->shepherd_comment,
+            'status' => 'Completed',
+        ]);
+
+        return redirect()->back()->with('success', 'Visitation marked as completed.');
     }
 }

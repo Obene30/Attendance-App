@@ -33,6 +33,16 @@
                     <input type="text" name="name" id="name" class="form-control" placeholder="Enter unique group name" required>
                 </div>
 
+                <div class="mb-3">
+                    <label for="category" class="form-label fw-semibold">Category</label>
+                    <input type="text" name="category" id="category" class="form-control" placeholder="e.g. Men, Women, Youths" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="subcategories" class="form-label fw-semibold">Subcategories</label>
+                    <input type="text" name="subcategories" id="subcategories" class="form-control" placeholder="Comma-separated (e.g. Ushers, Choir, Protocol)">
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center">
                     <button type="submit" class="btn btn-warning text-dark fw-semibold">
                         ✅ Create Group

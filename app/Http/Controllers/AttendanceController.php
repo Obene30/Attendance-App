@@ -171,10 +171,73 @@ class AttendanceController extends Controller
         return view('attendance.monthly-report', compact('currentMonth', 'dates', 'menData', 'womenData', 'childrenData', 'totalMen', 'totalWomen', 'totalChildren'));
     }
 
-    public function weeklyReport()
+
+
+    public function shepherdReport(Request $request)
+{
+    $query = Attendance::with(['attendee', 'markedBy']);
+    $fallbackMessage = null;
+
+    if ($request->filled('marked_by')) {
+        $markedName = $request->input('marked_by');
+
+        // Capture matching user IDs first
+        $userMatches = \App\Models\User::whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$markedName}%"])
+            ->pluck('id');
+
+        if ($userMatches->isEmpty()) {
+            $fallbackMessage = "No shepherd found matching '{$markedName}'.";
+            $query->whereRaw('1 = 0'); // prevent any results
+        } else {
+            $query->whereIn('marked_by', $userMatches);
+        }
+    }
+
+    if ($request->filled('date')) {
+        $query->whereDate('date', $request->input('date'));
+    }
+
+    $records = $query->orderBy('date', 'desc')->paginate(10);
+
+    $dates = $records->pluck('date')->unique()->sort()->values();
+    $statusGroups = [
+        'Present' => [],
+        'Absent' => [],
+    ];
+
+    foreach ($dates as $date) {
+        $statusGroups['Present'][] = $records->where('date', $date)->where('status', 'Present')->count();
+        $statusGroups['Absent'][] = $records->where('date', $date)->where('status', 'Absent')->count();
+    }
+
+    $totalPresent = $records->where('status', 'Present')->count();
+    $totalAbsent = $records->where('status', 'Absent')->count();
+
+    return view('admin.shepherd-report', compact(
+        'records', 'dates', 'statusGroups', 'totalPresent', 'totalAbsent', 'fallbackMessage'
+    ));
+}
+
+
+    
+    public function weeklyReport(Request $request)
     {
         ActivityLogController::log('view_weekly_report', 'Viewed weekly attendance report.');
-
+    
+        // Main filtered query
+        $query = Attendance::with('attendee');
+    
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->date);
+        }
+    
+        if ($request->filled('status')) {
+            $query->where('status', $request->status); // Should be "Present" or "Absent"
+        }
+    
+        $attendances = $query->orderBy('date', 'desc')->paginate(15);
+    
+        // Chart Data (optional but can be useful)
         $attendanceData = DB::table('attendances')
             ->select(
                 DB::raw('DATE(created_at) as date'),
@@ -186,7 +249,7 @@ class AttendanceController extends Controller
             ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('date', 'asc')
             ->get();
-
+    
         $chartData = [
             'labels' => $attendanceData->pluck('date'),
             'male' => $attendanceData->pluck('men'),
@@ -196,28 +259,48 @@ class AttendanceController extends Controller
             'total_women' => $attendanceData->sum('women'),
             'total_children' => $attendanceData->sum('children'),
         ];
+    
+        return view('attendance.report', compact('attendances', 'chartData'));
+    }
+    
+    // In AttendeeController
 
-        return view('attendance.report', compact('chartData'));
+public function requestVisitation(Request $request, Attendee $attendee)
+{
+    $request->validate([
+        'shepherd_id' => 'required|exists:users,id',
+        'admin_comment' => 'nullable|string',
+    ]);
+
+    $attendee->visitation()->updateOrCreate(
+        [],
+        [
+            'shepherd_id' => $request->shepherd_id,
+            'admin_comment' => $request->admin_comment,
+            'is_done' => false,
+        ]
+    );
+
+    return back()->with('success', 'Visitation request submitted!');
+}
+
+public function completeVisitation(Request $request, Attendee $attendee)
+{
+    $request->validate([
+        'shepherd_comment' => 'nullable|string',
+    ]);
+
+    if ($attendee->visitation && $attendee->visitation->shepherd_id === auth()->id()) {
+        $attendee->visitation->update([
+            'shepherd_comment' => $request->shepherd_comment,
+            'is_done' => true,
+        ]);
+
+        return back()->with('success', 'Visitation marked as completed.');
     }
 
-    public function report(Request $request)
-    {
-        $query = Attendance::query();
+    return back()->with('error', 'Unauthorized action.');
+}
 
-        if ($request->has('category') && !empty($request->category)) {
-            $query->whereHas('attendee', function ($q) use ($request) {
-                $q->where('category', $request->category);
-            });
-        }
 
-        if ($request->has('date') && !empty($request->date)) {
-            $query->whereDate('created_at', $request->date);
-        }
-
-        $attendances = $query->paginate(15);
-
-        ActivityLogController::log('view_weekly_report', 'Viewed filtered weekly report via report method.');
-
-        return view('attendance.report', compact('attendances'));
-    }
 }

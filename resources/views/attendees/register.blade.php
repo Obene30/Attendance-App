@@ -46,7 +46,7 @@
     <div class="card shadow-lg mx-auto" style="max-width: 600px;">
         <div class="card-header bg-warning text-center text-dark fw-bold">
             <img src="{{ asset('images/PHOTO-2025-03-04-20-14-01-removebg-preview.png') }}" alt="Church Logo" class="img-fluid">
-            <h5 class="fw-bold mt-2">First Time Registration Form</h5>
+            <h5 class="fw-bold mt-2">First Timers Welcoming Form</h5>
         </div>
 
         <div class="card-body p-4">
@@ -79,8 +79,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Date of Birth (MM-DD)</label>
-                    <input type="text" name="dob" class="form-control" placeholder="e.g. 04-15"
+                    <label class="form-label">Birthdays (MM-DD)</label>
+                    <input type="text" name="dob" class="form-control" placeholder="e.g. Jan-15"
                         pattern="^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$" title="Format: MM-DD" required>
                 </div>
 
@@ -90,7 +90,7 @@
                         <option value="">-- Select --</option>
                         <option>Male</option>
                         <option>Female</option>
-                        <option>Other</option>
+                       
                     </select>
                 </div>
 

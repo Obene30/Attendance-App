@@ -7,38 +7,70 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\ExternalMember;
 use App\Http\Controllers\ActivityLogController;
+use Illuminate\Support\Facades\DB;
 
 class GroupController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
-        $groups = Group::with('users')->paginate(5);
+        $query = Group::with(['users', 'externalMembers', 'subcategories']);
+    
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+    
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('users', function ($q) use ($search) {
+                      $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('externalMembers', function ($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+        }
+    
+        $groups = $query->paginate(10);
+    
         return view('groups.index', compact('groups'));
     }
-
+    
     public function create()
     {
         return view('groups.create');
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|unique:groups,name',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|unique:groups,name',
+        'category' => 'required|string|max:255',
+        'subcategories' => 'nullable|string',
+    ]);
 
-        $group = Group::create($request->only('name'));
+    $group = Group::create([
+        'name' => $request->name,
+        'category' => $request->category,
+    ]);
 
-        ActivityLogController::log('create_group', 'Created new group: ' . $group->name);
-
-        return redirect()->route('groups.index')->with('success', 'Group created successfully!');
+    if ($request->filled('subcategories')) {
+        $subs = array_map('trim', explode(',', $request->subcategories));
+        foreach ($subs as $sub) {
+            $group->subcategories()->create(['name' => $sub]);
+        }
+         ActivityLogController::log('create_group', 'Created new group: ' . $group->name);
     }
 
-    public function edit(Group $group)
-    {
-        $users = User::all();
-        return view('groups.edit', compact('group', 'users'));
-    }
+    return redirect()->route('groups.index')->with('success', 'Group created successfully.');
+}
+
+
+public function edit(Group $group)
+{
+    $group->load('subcategories'); // Eager load subcategories
+    $users = User::all(); // if used
+    return view('groups.edit', compact('group', 'users'));
+}
+
 
     public function update(Request $request, Group $group)
     {

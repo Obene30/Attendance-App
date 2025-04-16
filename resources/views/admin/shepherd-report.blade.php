@@ -4,10 +4,32 @@
 <div class="container py-4">
     <div class="card shadow border-0">
         <div class="card-header bg-warning text-dark text-center fw-bold">
-            <h4 class="mb-0">👨 Shepherd Report</h4>
+            <h4 class="mb-0">Shepherd Report</h4>
         </div>
 
         <div class="card-body bg-light">
+            @if(!empty($fallbackMessage))
+    <div class="alert alert-warning text-center">{{ $fallbackMessage }}</div>
+@endif
+
+            {{-- Filter Form --}}
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<form method="GET" action="{{ route('admin.shepherd.report') }}" class="row g-3 align-items-end mb-4">
+    <div class="col-md-4">
+        <label for="marked_by" class="form-label fw-semibold">Marked By</label>
+        <input type="text" name="marked_by" id="marked_by" class="form-control"
+            placeholder="Enter shepherd name..." value="{{ request('marked_by') }}">
+    </div>
+    <div class="col-md-4">
+        <label for="date" class="form-label fw-semibold">Date</label>
+        <input type="date" name="date" id="date" class="form-control" value="{{ request('date') }}">
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-warning text-dark fw-semibold"><i class="bi bi-search"></i> Filter</button>
+    </div>
+</form>
+
             @if($records->isEmpty())
                 <div class="alert alert-info text-center">No attendance records found.</div>
             @else

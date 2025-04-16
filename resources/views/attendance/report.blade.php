@@ -20,6 +20,14 @@
                     <label for="date" class="form-label fw-semibold">Filter by Date</label>
                     <input type="date" name="date" id="date" class="form-control" value="{{ request('date') }}">
                 </div>
+                <div class="col-md-4">
+                    <label for="status" class="form-label fw-semibold">Filter by Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">-- All Status --</option>
+                        <option value="Present" {{ request('status') == 'Present' ? 'selected' : '' }}>Present</option>
+                        <option value="Absent" {{ request('status') == 'Absent' ? 'selected' : '' }}>Absent</option>
+                    </select>
+                </div>
                 <div class="col-auto">
                     <button class="btn btn-warning text-dark fw-semibold">
                         <i class="bi bi-search"></i> Filter
@@ -68,10 +76,9 @@
     </div>
 </div>
 
-{{-- Bootstrap Icons (if not already loaded) --}}
+{{-- Bootstrap Icons --}}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-{{-- Optional Styles --}}
 <style>
     .form-control:focus {
         border-color: #ffc107;

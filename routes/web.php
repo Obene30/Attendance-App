@@ -91,7 +91,8 @@ Route::get('/attendance/export-excel', [AttendanceController::class, 'exportExce
 Route::get('/attendance/export-pdf', [AttendanceController::class, 'exportPDF'])->name('attendance.exportPDF');
 
 
-Route::get('/attendance-report', [AttendanceController::class, 'report'])->name('attendance.report');
+Route::get('/attendance-report', [AttendanceController::class, 'weeklyReport'])->name('attendance.report');
+
 
 //mark attendance
 Route::get('/attendance/mark', [AttendanceController::class, 'markAttendance'])->name('attendance.mark');
@@ -142,7 +143,9 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-Route::get('/admin/shepherd-report', [AdminController::class, 'shepherdReport'])->name('admin.shepherd.report')->middleware('auth');
+
+
+Route::get('/admin/shepherd-report', [AttendanceController::class, 'shepherdReport'])->name('admin.shepherd.report');
 
 
 Route::middleware(['auth'])->group(function () {
@@ -170,3 +173,16 @@ Route::post('/users/store', [UserController::class, 'store'])->name('users.store
 //attendee form route
 Route::get('/attendee/register', [AttendeeController::class, 'showForm'])->name('attendee.form');
 Route::post('/attendee/register', [AttendeeController::class, 'store'])->name('attendee.store');
+
+Route::delete('/groups/{group}/remove-user/{user}', [\App\Http\Controllers\GroupController::class, 'removeUser'])->name('groups.remove-user');
+Route::delete('/groups/{group}/remove-external/{external}', [\App\Http\Controllers\GroupController::class, 'removeExternalMember'])->name('groups.remove-external');
+
+Route::post('/attendees/{attendee}/visitation-request', [AttendeeController::class, 'requestVisitation'])->name('attendees.visitation.request');
+Route::put('/attendees/{attendee}/visitation-complete', [AttendeeController::class, 'completeVisitation'])->name('attendees.visitation.complete');
+
+Route::get('/shepherd/visitations', [AttendeeController::class, 'shepherdVisitations'])->name('shepherd.visitations');
+
+Route::get('/admin/visitations', [AttendeeController::class, 'allVisitations'])
+    ->name('admin.visitations.report');
+
+

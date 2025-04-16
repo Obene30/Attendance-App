@@ -12,15 +12,14 @@ class Attendance extends Model
     protected $fillable = ['attendee_id', 'status', 'date', 'comment', 'marked_by'];
 
     public function attendee()
-{
-    return $this->belongsTo(\App\Models\Attendee::class);
-}
-
-public function markedBy()
-{
-    return $this->belongsTo(\App\Models\User::class, 'marked_by');
-
-}
+    {
+        return $this->belongsTo(\App\Models\Attendee::class);
+    }
+    
+    public function markedBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'marked_by'); // 'marked_by' should exist on `attendances` table
+    }
 
 public function attendances()
 {
