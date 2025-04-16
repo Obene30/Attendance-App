@@ -21,16 +21,28 @@ class AttendeeController extends Controller
         // $this->middleware(['auth']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $query = Attendee::with(['shepherd', 'visitation']);
+    
         if (auth()->user()->hasRole('Shepherd')) {
-            $attendees = Attendee::where('user_id', auth()->id())->paginate(10);
-        } else {
-            $attendees = Attendee::paginate(15);
+            $query->where('user_id', auth()->id());
         }
-
+    
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%$search%")
+                  ->orWhereHas('shepherd', fn($q) => $q->where('first_name', 'like', "%$search%")
+                                                      ->orWhere('last_name', 'like', "%$search%"))
+                  ->orWhereHas('visitation', fn($q) => $q->where('status', 'like', "%$search%"));
+            });
+        }
+    
+        $attendees = $query->paginate(10)->appends($request->only('search'));
+    
         return view('attendees.index', compact('attendees'));
     }
+    
 
 
     public function shepherdVisitations()

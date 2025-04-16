@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="container py-4">
+
+    {{-- Heading and Add Button --}}
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <h2 class="text-dark fw-bold mb-2">⛪ Church Attendees</h2>
         <a href="{{ route('attendees.create') }}" class="btn btn-warning fw-semibold text-dark shadow-sm">
@@ -9,11 +11,28 @@
         </a>
     </div>
 
+    {{-- Success Message --}}
     @if(session('success'))
         <div class="alert alert-success text-center">{{ session('success') }}</div>
     @endif
 
-    {{-- Desktop Table View --}}
+    {{-- 🔍 Search Bar --}}
+    <form action="{{ route('attendees.index') }}" method="GET" class="mb-4">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-8 col-sm-12">
+                <input type="text" name="search" class="form-control"
+                       placeholder="Search by attendee, shepherd, or status..."
+                       value="{{ request('search') }}">
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <button type="submit" class="btn btn-warning w-100 fw-semibold text-dark">
+                    🔍 Search
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {{-- 🖥️ Desktop Table View --}}
     <div class="table-responsive d-none d-lg-block">
         <table class="table table-bordered table-hover align-middle shadow-sm text-center">
             <thead class="table-warning text-dark">
@@ -56,11 +75,10 @@
                     </td>
                     @endhasrole
 
-                    {{-- Visitation Form --}}
-                    <td>
-                        @include('partials._visitation-form', ['attendee' => $attendee])
-                    </td>
+                    {{-- Visitation --}}
+                    <td>@include('partials._visitation-form', ['attendee' => $attendee])</td>
 
+                    {{-- Status --}}
                     <td>
                         @if($attendee->visitation)
                             @if($attendee->visitation->shepherd_comment)
@@ -73,6 +91,7 @@
                         @endif
                     </td>
 
+                    {{-- Actions --}}
                     <td>
                         <div class="d-flex gap-2 justify-content-center">
                             <a href="{{ route('attendees.edit', $attendee) }}" class="btn btn-sm btn-primary">✏️</a>
@@ -88,7 +107,7 @@
         </table>
     </div>
 
-    {{-- Mobile / iPad Card View --}}
+    {{-- 📱 Mobile / iPad Card View --}}
     <div class="d-lg-none">
         @foreach($attendees as $attendee)
             <div class="card mb-3 shadow-sm">
@@ -141,18 +160,20 @@
         @endforeach
     </div>
 
+    {{-- Pagination --}}
     <div class="d-flex justify-content-center mt-3">
-        {{ $attendees->links() }}
+        {{ $attendees->appends(request()->query())->links() }}
     </div>
 </div>
 
-{{-- Confirmation --}}
+{{-- JS --}}
 <script>
     function confirmDelete() {
         return confirm("Are you sure you want to delete this attendee?");
     }
 </script>
 
+{{-- Styles --}}
 <style>
     .table th, .table td {
         vertical-align: middle;
