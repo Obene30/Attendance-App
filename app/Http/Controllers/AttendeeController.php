@@ -178,15 +178,18 @@ class AttendeeController extends Controller
             'dob' => ['required', 'regex:/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/'],
             'sex' => 'required|in:Male,Female',
             'category' => 'required|in:Men,Women,Children',
+            'phone_number' => 'required|string|max:20', // 👈 Add this
         ]);
-
+        
         $attendee = Attendee::create([
             'full_name' => $request->full_name,
             'address' => $request->address,
             'dob' => $request->dob,
             'sex' => $request->sex,
             'category' => $request->category,
+            'phone_number' => $request->phone_number, // 👈 And this
         ]);
+        
 
         ActivityLogController::log('create_attendee', 'Added new attendee: ' . $attendee->full_name);
 
