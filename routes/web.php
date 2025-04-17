@@ -174,6 +174,9 @@ Route::post('/users/store', [UserController::class, 'store'])->name('users.store
 Route::get('/attendee/register', [AttendeeController::class, 'showForm'])->name('attendee.form');
 Route::post('/attendee/register', [AttendeeController::class, 'store'])->name('attendee.store');
 
+Route::post('/attendees', [AttendeeController::class, 'store'])->name('attendees.store');
+
+
 Route::delete('/groups/{group}/remove-user/{user}', [\App\Http\Controllers\GroupController::class, 'removeUser'])->name('groups.remove-user');
 Route::delete('/groups/{group}/remove-external/{external}', [\App\Http\Controllers\GroupController::class, 'removeExternalMember'])->name('groups.remove-external');
 

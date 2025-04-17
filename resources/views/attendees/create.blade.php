@@ -19,6 +19,17 @@
                 </div>
             @endif
 
+            @if($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+
             <form action="{{ route('attendees.store') }}" method="POST" class="needs-validation" novalidate>
                 @csrf
                 <div class="mb-3">
@@ -38,6 +49,13 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="phone_number" class="form-control" value="{{ old('phone_number') }}">
+                </div>
+                
+                
+
+                <div class="mb-3">
                     <label for="sex" class="form-label fw-semibold">Sex</label>
                     <select class="form-select" id="sex" name="sex" required>
                         <option value="">-- Select --</option>
@@ -50,9 +68,9 @@
                     <label for="category" class="form-label fw-semibold">Category</label>
                     <select class="form-select" id="category" name="category" required>
                         <option value="">-- Select --</option>
-                        <option value="Men">🧔 Men</option>
-                        <option value="Women">👩 Women</option>
-                        <option value="Children">🧒 Children</option>
+                        <option value="Adults">👨‍👩‍👧 Adults</option>
+                        <option value="Children <13">🧒 Children &lt;13</option>
+                        
                     </select>
                 </div>
 

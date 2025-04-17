@@ -99,21 +99,24 @@ class AttendeeController extends Controller
             'address' => 'required|string',
             'dob' => ['required', 'regex:/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/'],
             'sex' => 'required|string',
-            'category' => 'required|string',
+            'category' => 'required|in:Adults,Children <13',
+            'phone_number' => 'nullable|string|max:20', // ✅ allow null for optional field
         ]);
-
+    
         $attendee->update([
             'full_name' => $request->full_name,
             'address' => $request->address,
             'dob' => $request->dob,
             'sex' => $request->sex,
             'category' => $request->category,
+            'phone_number' => $request->phone_number, // ✅ now updates phone number
         ]);
-
+    
         ActivityLogController::log('update_attendee', 'Updated attendee: ' . $attendee->full_name);
-
+    
         return redirect()->route('attendees.index')->with('success', 'Attendee updated successfully');
     }
+    
 
     public function destroy(Attendee $attendee)
     {
@@ -169,7 +172,6 @@ class AttendeeController extends Controller
     {
         return view('attendees.register');
     }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -177,24 +179,25 @@ class AttendeeController extends Controller
             'address' => 'required|string',
             'dob' => ['required', 'regex:/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/'],
             'sex' => 'required|in:Male,Female',
-            'category' => 'required|in:Men,Women,Children',
-            'phone_number' => 'required|string|max:20', // 👈 Add this
+            'category' => 'required|in:Adults,Children <13',
+            'phone_number' => 'nullable|string|max:20', // ✅ Make it optional here
         ]);
-        
+    
         $attendee = Attendee::create([
             'full_name' => $request->full_name,
             'address' => $request->address,
             'dob' => $request->dob,
             'sex' => $request->sex,
             'category' => $request->category,
-            'phone_number' => $request->phone_number, // 👈 And this
+            'phone_number' => $request->phone_number, // ✅ Saved if provided
         ]);
-        
-
+    
         ActivityLogController::log('create_attendee', 'Added new attendee: ' . $attendee->full_name);
-
-        return redirect()->back()->with('success', '🎉 Registration successful!, Thank you!');
+    
+        return redirect()->back()->with('success', '🎉 Registration successful! Thank you!');
     }
+    
+    
 
     public function requestVisitation(Request $request, Attendee $attendee)
 {

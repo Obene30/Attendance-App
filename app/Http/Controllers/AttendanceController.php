@@ -57,11 +57,10 @@ class AttendanceController extends Controller
         $attendanceData = Attendance::whereMonth('date', now()->month)->get();
 
         $dates = $attendanceData->pluck('date')->toArray();
-        $menData = $attendanceData->pluck('men')->toArray();
-        $womenData = $attendanceData->pluck('women')->toArray();
+        $adultData = $attendanceData->pluck('adults')->toArray();
         $childrenData = $attendanceData->pluck('children')->toArray();
 
-        return view('your_view', compact('dates', 'menData', 'womenData', 'childrenData'));
+        return view('your_view', compact('dates', 'adultData', 'childrenData'));
     }
 
     public function create()
@@ -105,7 +104,7 @@ class AttendanceController extends Controller
             $category = $attendance->attendee->category;
 
             if (!isset($weeklyData[$date])) {
-                $weeklyData[$date] = ['Male' => 0, 'Female' => 0, 'Children' => 0, 'total' => 0];
+                $weeklyData[$date] = ['Adults' => 0, 'Children <13' => 0, 'total' => 0];
             }
 
             $weeklyData[$date][$category]++;
@@ -152,155 +151,96 @@ class AttendanceController extends Controller
             ->get();
 
         $dates = $attendanceData->pluck('date')->unique()->values()->toArray();
-        $menData = [];
-        $womenData = [];
+        $adultData = [];
         $childrenData = [];
 
         foreach ($dates as $date) {
-            $menData[] = $attendanceData->where('date', $date)->where('attendee.category', 'Men')->count();
-            $womenData[] = $attendanceData->where('date', $date)->where('attendee.category', 'Women')->count();
-            $childrenData[] = $attendanceData->where('date', $date)->where('attendee.category', 'Children')->count();
+            $adultData[] = $attendanceData->where('date', $date)->where('attendee.category', 'Adults')->count();
+            $childrenData[] = $attendanceData->where('date', $date)->where('attendee.category', 'Children <13')->count();
         }
 
-        $totalMen = array_sum($menData);
-        $totalWomen = array_sum($womenData);
+        $totalAdult = array_sum($adultData);
         $totalChildren = array_sum($childrenData);
 
         ActivityLogController::log('view_monthly_report', 'Viewed monthly attendance report.');
 
-        return view('attendance.monthly-report', compact('currentMonth', 'dates', 'menData', 'womenData', 'childrenData', 'totalMen', 'totalWomen', 'totalChildren'));
+        return view('attendance.monthly-report', compact('currentMonth', 'dates', 'adultData', 'childrenData', 'totalAdult', 'totalChildren'));
     }
-
-
 
     public function shepherdReport(Request $request)
-{
-    $query = Attendance::with(['attendee', 'markedBy']);
-    $fallbackMessage = null;
+    {
+        $query = Attendance::with(['attendee', 'markedBy']);
+        $fallbackMessage = null;
 
-    if ($request->filled('marked_by')) {
-        $markedName = $request->input('marked_by');
+        if ($request->filled('marked_by')) {
+            $markedName = $request->input('marked_by');
 
-        // Capture matching user IDs first
-        $userMatches = \App\Models\User::whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$markedName}%"])
-            ->pluck('id');
+            $userMatches = \App\Models\User::whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$markedName}%"])->pluck('id');
 
-        if ($userMatches->isEmpty()) {
-            $fallbackMessage = "No shepherd found matching '{$markedName}'.";
-            $query->whereRaw('1 = 0'); // prevent any results
-        } else {
-            $query->whereIn('marked_by', $userMatches);
+            if ($userMatches->isEmpty()) {
+                $fallbackMessage = "No shepherd found matching '{$markedName}'.";
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereIn('marked_by', $userMatches);
+            }
         }
+
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->input('date'));
+        }
+
+        $records = $query->orderBy('date', 'desc')->paginate(10);
+
+        $dates = $records->pluck('date')->unique()->sort()->values();
+        $statusGroups = ['Present' => [], 'Absent' => []];
+
+        foreach ($dates as $date) {
+            $statusGroups['Present'][] = $records->where('date', $date)->where('status', 'Present')->count();
+            $statusGroups['Absent'][] = $records->where('date', $date)->where('status', 'Absent')->count();
+        }
+
+        $totalPresent = $records->where('status', 'Present')->count();
+        $totalAbsent = $records->where('status', 'Absent')->count();
+
+        return view('admin.shepherd-report', compact('records', 'dates', 'statusGroups', 'totalPresent', 'totalAbsent', 'fallbackMessage'));
     }
 
-    if ($request->filled('date')) {
-        $query->whereDate('date', $request->input('date'));
-    }
-
-    $records = $query->orderBy('date', 'desc')->paginate(10);
-
-    $dates = $records->pluck('date')->unique()->sort()->values();
-    $statusGroups = [
-        'Present' => [],
-        'Absent' => [],
-    ];
-
-    foreach ($dates as $date) {
-        $statusGroups['Present'][] = $records->where('date', $date)->where('status', 'Present')->count();
-        $statusGroups['Absent'][] = $records->where('date', $date)->where('status', 'Absent')->count();
-    }
-
-    $totalPresent = $records->where('status', 'Present')->count();
-    $totalAbsent = $records->where('status', 'Absent')->count();
-
-    return view('admin.shepherd-report', compact(
-        'records', 'dates', 'statusGroups', 'totalPresent', 'totalAbsent', 'fallbackMessage'
-    ));
-}
-
-
-    
     public function weeklyReport(Request $request)
     {
         ActivityLogController::log('view_weekly_report', 'Viewed weekly attendance report.');
-    
-        // Main filtered query
+
         $query = Attendance::with('attendee');
-    
+
         if ($request->filled('date')) {
             $query->whereDate('date', $request->date);
         }
-    
+
         if ($request->filled('status')) {
-            $query->where('status', $request->status); // Should be "Present" or "Absent"
+            $query->where('status', $request->status);
         }
-    
+
         $attendances = $query->orderBy('date', 'desc')->paginate(15);
-    
-        // Chart Data (optional but can be useful)
+
         $attendanceData = DB::table('attendances')
+            ->join('attendees', 'attendees.id', '=', 'attendances.attendee_id')
             ->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('SUM(CASE WHEN category = "Men" THEN 1 ELSE 0 END) as men'),
-                DB::raw('SUM(CASE WHEN category = "Women" THEN 1 ELSE 0 END) as women'),
-                DB::raw('SUM(CASE WHEN category = "Children" THEN 1 ELSE 0 END) as children')
+                DB::raw('DATE(attendances.created_at) as date'),
+                DB::raw('SUM(CASE WHEN attendees.category = "Adults" THEN 1 ELSE 0 END) as adults'),
+                DB::raw('SUM(CASE WHEN attendees.category = "Children <13" THEN 1 ELSE 0 END) as children')
             )
-            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
-            ->groupBy(DB::raw('DATE(created_at)'))
+            ->whereBetween('attendances.created_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->groupBy(DB::raw('DATE(attendances.created_at)'))
             ->orderBy('date', 'asc')
             ->get();
-    
+
         $chartData = [
             'labels' => $attendanceData->pluck('date'),
-            'male' => $attendanceData->pluck('men'),
-            'female' => $attendanceData->pluck('women'),
+            'adults' => $attendanceData->pluck('adults'),
             'children' => $attendanceData->pluck('children'),
-            'total_men' => $attendanceData->sum('men'),
-            'total_women' => $attendanceData->sum('women'),
+            'total_adults' => $attendanceData->sum('adults'),
             'total_children' => $attendanceData->sum('children'),
         ];
-    
+
         return view('attendance.report', compact('attendances', 'chartData'));
     }
-    
-    // In AttendeeController
-
-public function requestVisitation(Request $request, Attendee $attendee)
-{
-    $request->validate([
-        'shepherd_id' => 'required|exists:users,id',
-        'admin_comment' => 'nullable|string',
-    ]);
-
-    $attendee->visitation()->updateOrCreate(
-        [],
-        [
-            'shepherd_id' => $request->shepherd_id,
-            'admin_comment' => $request->admin_comment,
-            'is_done' => false,
-        ]
-    );
-
-    return back()->with('success', 'Visitation request submitted!');
-}
-
-public function completeVisitation(Request $request, Attendee $attendee)
-{
-    $request->validate([
-        'shepherd_comment' => 'nullable|string',
-    ]);
-
-    if ($attendee->visitation && $attendee->visitation->shepherd_id === auth()->id()) {
-        $attendee->visitation->update([
-            'shepherd_comment' => $request->shepherd_comment,
-            'is_done' => true,
-        ]);
-
-        return back()->with('success', 'Visitation marked as completed.');
-    }
-
-    return back()->with('error', 'Unauthorized action.');
-}
-
-
 }
