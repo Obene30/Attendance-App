@@ -194,23 +194,35 @@ class AttendeeController extends Controller
     }
 
     public function requestVisitation(Request $request, Attendee $attendee)
-    {
-        $request->validate([
-            'shepherd_id' => 'required|exists:users,id',
-            'admin_comment' => 'nullable|string|max:1000',
-        ]);
-
+{
+    $request->validate([
+        'shepherd_ids' => 'required|array|min:1',
+        'shepherd_ids.*' => 'exists:users,id',
+    ]);
+    
+    foreach ($request->shepherd_ids as $shepherdId) {
         Visitation::updateOrCreate(
-            ['attendee_id' => $attendee->id],
-            [
-                'shepherd_id' => $request->shepherd_id,
-                'admin_comment' => $request->admin_comment,
-                'status' => 'Pending',
-            ]
+            ['attendee_id' => $attendee->id, 'shepherd_id' => $shepherdId],
+            ['admin_comment' => $request->admin_comment, 'status' => 'Pending']
         );
-
-        return redirect()->back()->with('success', 'Visitation request sent.');
     }
+    
+
+    return redirect()->back()->with('success', 'Visitation request assigned to selected shepherd(s).');
+}
+
+
+public function cancelVisitation(Attendee $attendee)
+{
+    if ($attendee->visitation && $attendee->visitation->count()) {
+        $attendee->visitation->each->delete(); // This safely deletes all related visitations
+        return back()->with('success', 'All visitation requests for this attendee have been cancelled.');
+    }
+
+    return back()->with('error', 'No visitation found for this attendee.');
+}
+
+
 
     public function completeVisitation(Request $request, Attendee $attendee)
     {

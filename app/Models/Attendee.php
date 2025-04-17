@@ -22,9 +22,10 @@ class Attendee extends Model
         }
 
         public function visitation() {
-            return $this->hasOne(Visitation::class);
+            return $this->hasMany(Visitation::class);
         }
         
+
 
 }
 

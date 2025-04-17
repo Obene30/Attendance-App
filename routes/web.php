@@ -184,5 +184,8 @@ Route::get('/shepherd/visitations', [AttendeeController::class, 'shepherdVisitat
 
 Route::get('/admin/visitations', [AttendeeController::class, 'allVisitations'])
     ->name('admin.visitations.report');
+    
+    Route::delete('/attendees/{attendee}/visitation/cancel', [App\Http\Controllers\AttendeeController::class, 'cancelVisitation'])->name('attendees.visitation.cancel');
+
 
 
