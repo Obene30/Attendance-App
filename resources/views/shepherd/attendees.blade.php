@@ -24,6 +24,7 @@
                                 <th>Birthday</th>
                                 <th>Sex</th>
                                 <th>Category</th>
+                                <th>Phone number</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,6 +37,7 @@
                                     <td>
                                         <span class="badge bg-secondary">{{ $attendee->category }}</span>
                                     </td>
+                                    <td>{{ $attendee->phone_number }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

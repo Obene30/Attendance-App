@@ -10,6 +10,7 @@ use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ActivityLogController;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\AttendeesImport;
 use App\Exports\AttendanceExport;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -42,8 +43,6 @@ class AttendeeController extends Controller
     
         return view('attendees.index', compact('attendees'));
     }
-    
-
 
     public function shepherdVisitations()
     {
@@ -51,32 +50,28 @@ class AttendeeController extends Controller
             ->where('shepherd_id', auth()->id())
             ->latest()
             ->get();
-    
-        return view('shepherd.visitations', compact('visitations')); // ✅ FIXED: use 'visitations'
+
+        return view('shepherd.visitations', compact('visitations'));
     }
-    
+
     public function allVisitations(Request $request)
     {
         $query = \App\Models\Visitation::with(['attendee', 'shepherd']);
-    
+
         if ($request->filled('shepherd')) {
             $query->whereHas('shepherd', function ($q) use ($request) {
                 $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$request->shepherd}%"]);
             });
         }
-    
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-    
+
         $visitations = $query->latest()->paginate(10);
-    
+
         return view('admin.visitation-report', compact('visitations'));
     }
-    
-    
-
-
 
     public function create()
     {
@@ -100,23 +95,22 @@ class AttendeeController extends Controller
             'dob' => ['required', 'regex:/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/'],
             'sex' => 'required|string',
             'category' => 'required|in:Adults,Children <13',
-            'phone_number' => 'nullable|string|max:20', // ✅ allow null for optional field
+            'phone_number' => 'nullable|string|max:20',
         ]);
-    
+
         $attendee->update([
             'full_name' => $request->full_name,
             'address' => $request->address,
             'dob' => $request->dob,
             'sex' => $request->sex,
             'category' => $request->category,
-            'phone_number' => $request->phone_number, // ✅ now updates phone number
+            'phone_number' => $request->phone_number,
         ]);
-    
+
         ActivityLogController::log('update_attendee', 'Updated attendee: ' . $attendee->full_name);
-    
+
         return redirect()->route('attendees.index')->with('success', 'Attendee updated successfully');
     }
-    
 
     public function destroy(Attendee $attendee)
     {
@@ -172,6 +166,7 @@ class AttendeeController extends Controller
     {
         return view('attendees.register');
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -180,55 +175,49 @@ class AttendeeController extends Controller
             'dob' => ['required', 'regex:/^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/'],
             'sex' => 'required|in:Male,Female',
             'category' => 'required|in:Adults,Children <13',
-            'phone_number' => 'nullable|string|max:20', // ✅ Make it optional here
+            'phone_number' => 'nullable|string|max:20',
         ]);
-    
+
         $attendee = Attendee::create([
             'full_name' => $request->full_name,
             'address' => $request->address,
             'dob' => $request->dob,
             'sex' => $request->sex,
             'category' => $request->category,
-            'phone_number' => $request->phone_number, // ✅ Saved if provided
+            'phone_number' => $request->phone_number,
         ]);
-    
+
         ActivityLogController::log('create_attendee', 'Added new attendee: ' . $attendee->full_name);
-    
+
         return redirect()->back()->with('success', '🎉 Registration successful! Thank you!');
     }
-    
-    
 
     public function requestVisitation(Request $request, Attendee $attendee)
-{
-    $request->validate([
-        'shepherd_ids' => 'required|array|min:1',
-        'shepherd_ids.*' => 'exists:users,id',
-    ]);
-    
-    foreach ($request->shepherd_ids as $shepherdId) {
-        Visitation::updateOrCreate(
-            ['attendee_id' => $attendee->id, 'shepherd_id' => $shepherdId],
-            ['admin_comment' => $request->admin_comment, 'status' => 'Pending']
-        );
-    }
-    
+    {
+        $request->validate([
+            'shepherd_ids' => 'required|array|min:1',
+            'shepherd_ids.*' => 'exists:users,id',
+        ]);
 
-    return redirect()->back()->with('success', 'Visitation request assigned to selected shepherd(s).');
-}
+        foreach ($request->shepherd_ids as $shepherdId) {
+            Visitation::updateOrCreate(
+                ['attendee_id' => $attendee->id, 'shepherd_id' => $shepherdId],
+                ['admin_comment' => $request->admin_comment, 'status' => 'Pending']
+            );
+        }
 
-
-public function cancelVisitation(Attendee $attendee)
-{
-    if ($attendee->visitation && $attendee->visitation->count()) {
-        $attendee->visitation->each->delete(); // This safely deletes all related visitations
-        return back()->with('success', 'All visitation requests for this attendee have been cancelled.');
+        return redirect()->back()->with('success', 'Visitation request assigned to selected shepherd(s).');
     }
 
-    return back()->with('error', 'No visitation found for this attendee.');
-}
+    public function cancelVisitation(Attendee $attendee)
+    {
+        if ($attendee->visitation && $attendee->visitation->count()) {
+            $attendee->visitation->each->delete();
+            return back()->with('success', 'All visitation requests for this attendee have been cancelled.');
+        }
 
-
+        return back()->with('error', 'No visitation found for this attendee.');
+    }
 
     public function completeVisitation(Request $request, Attendee $attendee)
     {
@@ -246,5 +235,21 @@ public function cancelVisitation(Attendee $attendee)
         ]);
 
         return redirect()->back()->with('success', 'Visitation marked as completed.');
+    }
+
+    public function showImportForm()
+    {
+        return view('attendees.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new AttendeesImport, $request->file('file'));
+
+        return redirect()->route('attendees.index')->with('success', 'Attendees imported successfully!');
     }
 }

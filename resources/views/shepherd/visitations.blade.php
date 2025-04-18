@@ -19,6 +19,7 @@
                     <table class="table table-bordered align-middle text-center table-hover">
                         <thead class="table-warning text-dark">
                             <tr>
+                             
                                 <th>Attendee</th>
                                 <th>Category</th>
                                 <th>Address</th>
@@ -26,6 +27,8 @@
                                 <th>Status</th>
                                 <th>Shepherd Comment</th>
                                 <th>Action</th>
+                              
+                                
                             </tr>
                         </thead>
                         <tbody>
@@ -35,6 +38,7 @@
                                     <td>{{ $visitation->attendee->category }}</td>
                                     <td>{{ $visitation->attendee->address }}</td>
                                     <td>{{ $visitation->admin_comment ?? '—' }}</td>
+                            
                                     <td>
                                         <span class="badge {{ $visitation->status === 'Completed' ? 'bg-success' : 'bg-secondary' }}">
                                             {{ $visitation->status }}

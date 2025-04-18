@@ -190,5 +190,10 @@ Route::get('/admin/visitations', [AttendeeController::class, 'allVisitations'])
     
     Route::delete('/attendees/{attendee}/visitation/cancel', [App\Http\Controllers\AttendeeController::class, 'cancelVisitation'])->name('attendees.visitation.cancel');
 
+//import attendee data
+
+Route::get('/attendees/import', [AttendeeController::class, 'showImportForm'])->name('attendees.import.form');
+Route::post('/attendees/import', [AttendeeController::class, 'import'])->name('attendees.import');
+
 
 
