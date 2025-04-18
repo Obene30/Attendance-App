@@ -129,7 +129,7 @@
                 </ul>
             </li>
 
-            <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link">🚪 Logout</a></li>
+            <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link">🔓 Logout</a></li>
         @endif
 
         @if(auth()->user()->hasRole('Shepherd'))
@@ -138,7 +138,7 @@
             <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link">🖊️ Mark Attendance</a></li>
             <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link">📅 View Attendance</a></li>
             <li class="nav-item"><a href="{{ route('shepherd.visitations') }}" class="nav-link">👣 Shepherd Visitation</a></li>
-            <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link">🚪 Logout</a></li>
+            <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link">🔓 Logout</a></li>
         @endif
 
         @if(auth()->user()->hasRole('Member'))
