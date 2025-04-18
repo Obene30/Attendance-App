@@ -9,6 +9,7 @@
     @endif
 
     <form method="POST" action="{{ route('attendees.import') }}" enctype="multipart/form-data">
+
         @csrf
         <div class="mb-3">
             <label class="form-label">Choose Excel File</label>

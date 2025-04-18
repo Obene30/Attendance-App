@@ -22,7 +22,8 @@ Route::get('/', function () {
     return view('welcome'); // Change to dashboard if needed
 });
 
-Route::resource('attendees', AttendeeController::class);
+Route::resource('attendees', AttendeeController::class)->except(['show']);
+
 Route::get('/attendance', [AttendanceController::class, 'markAttendance'])->name('attendance.index');
 Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
 Route::get('/report/{period}', [AttendanceController::class, 'report'])->name('attendance.report');
@@ -76,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Attendee Management
-Route::resource('attendees', AttendeeController::class);
+
 
 // Attendance Management
 //Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');  // View all attendance
@@ -192,8 +193,12 @@ Route::get('/admin/visitations', [AttendeeController::class, 'allVisitations'])
 
 //import attendee data
 
+Route::resource('attendees', AttendeeController::class)->except(['show']);
 Route::get('/attendees/import', [AttendeeController::class, 'showImportForm'])->name('attendees.import.form');
 Route::post('/attendees/import', [AttendeeController::class, 'import'])->name('attendees.import');
+
+
+
 
 
 
