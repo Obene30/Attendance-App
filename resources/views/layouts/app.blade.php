@@ -119,10 +119,10 @@
 
 
             <li class="nav-item"><a href="{{ route('attendance.logs') }}" class="nav-link">📄 Activity Logs</a></li>
-            <li class="nav-item"><a href="{{ route('attendees.import') }}" class="nav-link">📄 Import Data</a></li>
+            <li class="nav-item"><a href="{{ route('attendees.import') }}" class="nav-link">📤 Import File</a></li>
 
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">📤 Export</a>
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">⬇️ Download Report</a>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{{ route('attendance.exportExcel') }}">📂 Export Excel</a></li>
                     <li><a class="dropdown-item" href="{{ route('attendance.exportPDF') }}">📄 Export PDF</a></li>
