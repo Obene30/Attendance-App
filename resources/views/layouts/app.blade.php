@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- DataTables CSS -->
-<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +9,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
     <style>
         body {
@@ -27,15 +30,16 @@
             left: 0;
             z-index: 1000;
             transition: transform 0.3s ease-in-out;
+            overflow-y: auto; /* allow vertical scroll */
         }
 
         .sidebar.collapsed {
-            transform: translateX(-250px);
+            transform: translateX(-100%);
         }
 
         #content {
-            transition: margin-left 0.3s ease-in-out;
             margin-left: 250px;
+            transition: margin-left 0.3s ease-in-out;
         }
 
         #content.expanded {
@@ -78,16 +82,17 @@
         }
 
         @media (max-width: 768px) {
+            .sidebar {
+                height: 100vh;
+                overflow-y: auto;
+            }
+
             #content {
                 margin-left: 0;
             }
         }
     </style>
 </head>
-<!-- jQuery and DataTables JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <body>
 
@@ -115,9 +120,8 @@
                     <li><a class="dropdown-item" href="{{ route('admin.shepherd.report') }}">📉 Shepherd Report</a></li>
                 </ul>
             </li>
+
             <li class="nav-item"><a href="{{ route('users.create') }}" class="nav-link">👤 Create User</a></li>
-
-
             <li class="nav-item"><a href="{{ route('attendance.logs') }}" class="nav-link">📄 Activity Logs</a></li>
             <li class="nav-item"><a href="{{ route('attendees.import') }}" class="nav-link">📤 Import File</a></li>
 
@@ -145,7 +149,7 @@
             <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link">🏠 Dashboard</a></li>
             <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link">✅ Mark Attendance</a></li>
             <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link">📅 View Attendance</a></li>
-            <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link">🚪 Logout</a></li>
+            <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link">🔓 Logout</a></li>
         @endif
     </ul>
 </nav>
