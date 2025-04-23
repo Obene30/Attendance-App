@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container py-4">
-    <h2 class="fw-bold mb-4 text-dark">📅 Shepherd View: Upcoming Events</h2>
+    <h2 class="fw-bold mb-4 text-dark">📅 Events & Schedule</h2>
 
     {{-- Filter by Date --}}
     <form method="GET" class="mb-3 row g-2">

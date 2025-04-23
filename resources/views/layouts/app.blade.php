@@ -111,7 +111,7 @@
             <li class="nav-item"><a href="{{ route('admin.visitations.report') }}" class="nav-link">📋 Visitation Report</a></li>
             <li class="nav-item"><a href="{{ route('admin.shepherd-attendance') }}" class="nav-link">📘 All Shepherd Log</a></li>
             <li class="nav-item"><a href="{{ route('groups.index') }}" class="nav-link">👥 Group Manager</a></li>
-            <li class="nav-item"><a href="{{ route('events.index') }}" class="nav-link">📅 Event Manager</a></li>
+            <li class="nav-item"><a href="{{ route('events.index') }}" class="nav-link">⏰ Event Manager</a></li>
 
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">📊 Reports</a>
@@ -143,7 +143,7 @@
             <li class="nav-item"><a href="{{ route('attendance.mark') }}" class="nav-link">🖊️ Mark Attendance</a></li>
             <li class="nav-item"><a href="{{ route('attendance.view') }}" class="nav-link">📅 View Attendance</a></li>
             <li class="nav-item"><a href="{{ route('shepherd.visitations') }}" class="nav-link">👣 Shepherd Visitation</a></li>
-            <li class="nav-item"><a href="{{ route('shepherd.events') }}" class="nav-link">📅 Events</a></li>
+            <li class="nav-item"><a href="{{ route('shepherd.events') }}" class="nav-link">⏰ Events & Schedule</a></li>
             <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link">🔓 Logout</a></li>
         @endif
 
