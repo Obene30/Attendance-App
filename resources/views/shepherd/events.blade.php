@@ -25,6 +25,7 @@
                         <th>Start</th>
                         <th>End</th>
                         <th>Description</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,9 +35,22 @@
                             <td>{{ \Carbon\Carbon::parse($event->start_time)->format('M d, Y h:i A') }}</td>
                             <td>{{ $event->end_time ? \Carbon\Carbon::parse($event->end_time)->format('M d, Y h:i A') : '—' }}</td>
                             <td>{{ $event->description ?? '—' }}</td>
+                            <td>
+                                @php
+                                    $now = \Carbon\Carbon::now();
+                                    $start = \Carbon\Carbon::parse($event->start_time);
+                                @endphp
+                                @if($start->isToday())
+                                    <span class="badge bg-info text-dark">Today</span>
+                                @elseif($start->isFuture())
+                                    <span class="badge bg-success">Upcoming</span>
+                                @else
+                                    <span class="badge bg-secondary">Past</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="text-muted">No events found.</td></tr>
+                        <tr><td colspan="5" class="text-muted">No events found.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -84,4 +98,25 @@
         calendar.render();
     });
 </script>
+
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    #calendar {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-warning {
+        background-color: #f5c518;
+        border-color: #f5c518;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0b114;
+    }
+</style>
 @endsection
