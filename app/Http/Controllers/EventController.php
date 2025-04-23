@@ -81,4 +81,30 @@ class EventController extends Controller
         $event->delete();
         return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
     }
+
+
+
+    public function shepherdEvents(Request $request)
+{
+    $query = Event::query();
+
+    if ($request->filled('date')) {
+        $query->whereDate('start_time', $request->date);
+    }
+
+    $events = $query->orderBy('start_time')->paginate(10); // ✅ Use paginate
+
+    $calendarEvents = $query->get()->map(function ($event) {
+        return [
+            'title' => $event->title,
+            'start' => $event->start_time,
+            'end' => $event->end_time,
+            'description' => $event->description,
+        ];
+    });
+
+    return view('shepherd.events', compact('events', 'calendarEvents'));
+}
+
+
 }

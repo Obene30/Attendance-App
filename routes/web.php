@@ -212,5 +212,12 @@ Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('even
 Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
 Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
 
+//shepherd view
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/shepherd/events', [EventController::class, 'shepherdEvents'])->name('shepherd.events');
+});
+
 
 
