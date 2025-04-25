@@ -48,7 +48,7 @@ class EventController extends Controller
             'description' => $request->description,
         ]);
 
-        return redirect()->route('events.index')->with('success', 'Event created successfully!');
+        return redirect()->route('events.store')->with('success', 'Event created successfully!');
     }
 
     public function edit(Event $event)
