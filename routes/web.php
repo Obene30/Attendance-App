@@ -220,4 +220,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+Route::get('/attendee/success', function () {
+    return view('attendees.success');
+})->name('attendee.success');
+
 

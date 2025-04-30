@@ -189,7 +189,8 @@ class AttendeeController extends Controller
 
         ActivityLogController::log('create_attendee', 'Added new attendee: ' . $attendee->full_name);
 
-        return redirect()->back()->with('success', '🎉 Registration successful! Thank you!');
+        return redirect()->route('attendee.success');
+
     }
 
     public function requestVisitation(Request $request, Attendee $attendee)

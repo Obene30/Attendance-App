@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome | MSCI Church Attendance</title>
-    v<link rel="icon" type="image/png" href="{{ asset('images/PHOTO-2025-03-04-20-14-01-removebg-preview.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/PHOTO-2025-03-04-20-14-01-removebg-preview.png') }}">
 
     
     <!-- Bootstrap CSS -->
