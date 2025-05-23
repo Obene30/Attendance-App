@@ -44,16 +44,15 @@
                         <option value="Male" {{ $attendee->sex == 'Male' ? 'selected' : '' }}>👦 Male</option>
                         <option value="Female" {{ $attendee->sex == 'Female' ? 'selected' : '' }}>👧 Female</option>
                     </select>
-                </div>
-
+                
                 <div class="mb-4">
                     <label for="category" class="form-label fw-semibold">Category</label>
                     <select class="form-select" id="category" name="category" required>
-                        <option value="Men" {{ $attendee->category == 'Men' ? 'selected' : '' }}>🧔 Men</option>
-                        <option value="Women" {{ $attendee->category == 'Women' ? 'selected' : '' }}>👩 Women</option>
-                        <option value="Children" {{ $attendee->category == 'Children' ? 'selected' : '' }}>🧒 Children</option>
+                        <option value="Adults" {{ $attendee->category == 'Adults' ? 'selected' : '' }}>🧑 Adults</option>
+                        <option value="Children <13" {{ $attendee->category == 'Children <13' ? 'selected' : '' }}>🧒 Children &lt;13</option>
                     </select>
                 </div>
+                
 
                 <div class="text-end">
                     <button type="submit" class="btn btn-warning text-dark fw-semibold">

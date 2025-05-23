@@ -25,6 +25,8 @@ Route::get('/', function () {
 
 Route::resource('attendees', AttendeeController::class)->except(['show']);
 
+
+
 Route::get('/attendance', [AttendanceController::class, 'markAttendance'])->name('attendance.index');
 Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
 Route::get('/report/{period}', [AttendanceController::class, 'report'])->name('attendance.report');
@@ -177,6 +179,11 @@ Route::get('/attendee/register', [AttendeeController::class, 'showForm'])->name(
 Route::post('/attendee/register', [AttendeeController::class, 'store'])->name('attendee.store');
 
 Route::post('/attendees', [AttendeeController::class, 'store'])->name('attendees.store');
+
+
+
+
+
 
 
 Route::delete('/groups/{group}/remove-user/{user}', [\App\Http\Controllers\GroupController::class, 'removeUser'])->name('groups.remove-user');
